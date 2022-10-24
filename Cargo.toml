@@ -23,6 +23,7 @@ features = [
 
 [lib]
 name = "libes"
+crate-type = ["dylib"]
 path = "src/lib.rs"
 test = true
 doctest = true

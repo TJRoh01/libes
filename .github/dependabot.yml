@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "US/Central"
+    assignees:
+      - "TJRoh01"
+    reviewers:
+      - "TJRoh01"
