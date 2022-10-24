@@ -56,7 +56,6 @@ In doing this I commit myself to:
 - ❌ Compact mode not compatible
 
 ### Elliptic Curve Key Support Matrix
-
 | Algorithm | Support | Compact |
 |:---------:|:-------:|:-------:|
 |  x25519   |   🏗️   |    ✅    |
@@ -66,18 +65,13 @@ In doing this I commit myself to:
 |   p521    |   🤔    |    ❔    |
 |   k256    |   🤔    |    ❔    |
 
-#### Footnotes
-TBA
-
 ### Encryption Support Matrix
-
 |     Algorithm      |           Support           | Compact |
 |:------------------:|:---------------------------:|:-------:|
 | ChaCha20-Poly1305  | 🚫[^chacha_nonce_collision] | __N/A__ |
 | XChaCha20-Poly1305 |             🏗️             |    ✅    |
 | AES-GCM-HMAC-SHAX  |             🤔              |    ❔    |
 
-#### Footnotes
 [^chacha_nonce_collision]: ChaCha20 uses a 96-bit nonce,
 which when generated using a random function has an unsatisfactory
 risk of collision. XChaCha20 uses a 192-bit nonce
@@ -175,7 +169,7 @@ graph TB
 **DISCLAIMER:** Compact mode is my own implementation idea, which I will only
 implement for algorithms that I have done extensive research on to ensure
 that it is cryptographically secure to do so. Regardless, I am not a cryptography
-researcher nor expert and I can not give a guarantee that issues will not arise
+researcher and I can not give a guarantee that issues will not arise
 in the future. If compact mode turns out to be useful/popular and resources allow,
 I will make sure compact mode receives a security audit.
 
