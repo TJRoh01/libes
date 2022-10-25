@@ -23,8 +23,8 @@
 
 [features]
     # Elliptic Curve
-    x25519 = []
-    ed25519 = []
+    x25519 = ["dep:x25519-dalek"]
+    ed25519 = ["dep:ed25519-dalek"]
     P-256 = ["secp256r1"]
     secp256r1 = []
     P-384 = ["secp384r1"]
@@ -32,10 +32,14 @@
     P-521 = ["secp521r1"]
     secp521r1 = []
     # Encryption
-    XChaCha20-Poly1305 = []
+    XChaCha20-Poly1305 = ["dep:chacha20poly1305"]
     AES-GCM = []
     # Authentication
     HMAC-SHA256 = []
     HMAC-SHA512 = []
 
 [dependencies]
+zeroize = "1.5.7"
+rand_core = "0.6.4"
+x25519-dalek = { version = "2.0.0-pre.1", optional = true }
+chacha20poly1305 = { version = "0.10.1", optional = true }
