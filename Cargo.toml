@@ -1,35 +1,41 @@
 [package]
-name = "libes"
-version = "0.1.2"
-authors = ["Tomas Rohatynski"]
-edition = "2021"
-rust-version = "1.60"
-description = "Collection of Elliptic Curve Integrated Encryption Scheme(s)"
-readme = "README_CRATES_IO.md"
-homepage = "https://gitlab.com/TJRoh01/libes"
-repository = "https://gitlab.com/TJRoh01/libes"
-license = "MIT OR Apache-2.0"
-keywords = ["library", "encryption", "cypto", "ecc", "ecies"]
-categories = ["cryptography", "data-structures", "encoding", "algorithms"]
-
-features = [
-    # Elliptic Curve Key
-    "x25519",
-    "ed25519",
-    # Encryption
-    "XChaCha20Poly1305",
-    # Mode
-    "compact"
-]
+    name = "libes"
+    version = "0.1.3"
+    authors = ["Tomas Rohatynski"]
+    edition = "2021"
+    rust-version = "1.60"
+    description = "Collection of Elliptic Curve Integrated Encryption Scheme(s)"
+    readme = "README_CRATES_IO.md"
+    homepage = "https://gitlab.com/TJRoh01/libes"
+    repository = "https://gitlab.com/TJRoh01/libes"
+    license = "MIT OR Apache-2.0"
+    keywords = ["library", "encryption", "cypto", "ecc", "ecies"]
+    categories = ["cryptography", "data-structures", "encoding", "algorithms"]
 
 [lib]
-name = "libes"
-crate-type = ["dylib"]
-path = "src/lib.rs"
-test = true
-doctest = true
-bench = false
-doc = true
+    name = "libes"
+    crate-type = ["dylib"]
+    path = "src/lib.rs"
+    test = true
+    doctest = true
+    bench = false
+    doc = true
 
+[features]
+    # Elliptic Curve
+    x25519 = []
+    ed25519 = []
+    P-256 = ["secp256r1"]
+    secp256r1 = []
+    P-384 = ["secp384r1"]
+    secp384r1 = []
+    P-521 = ["secp521r1"]
+    secp521r1 = []
+    # Encryption
+    XChaCha20-Poly1305 = []
+    AES-GCM = []
+    # MAC
+    HMAC-SHA256 = []
+    HMAC-SHA512 = []
 
 [dependencies]
