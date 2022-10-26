@@ -255,7 +255,7 @@ graph TB
     end
     
     subgraph Derive
-        DER_FN("Derive Shared Secret</br>(e.g. with ECDH -> SHA256)</br><- and split ->")
+        DER_FN("Derive Shared Secret</br>(e.g. with ECDH -> SHA512)</br><- and split ->")
         DER_IV("Derived IV/Nonce")
         DER_ENC_KEY("Derived Encryption Key")
     end
