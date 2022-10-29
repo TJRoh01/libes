@@ -1,66 +1,77 @@
 use std::marker::PhantomData;
-use crate::generics::{DeriveKeyMaterial, GenNonce, SplitEncKey, SplitMacKey};
+use crate::auth::{Mac, SplitMac, SplitMacKey};
+use crate::enc::{Encryption, GenNonce, SplitEncKey, SplitNonce};
+use crate::key::{DeriveKeyMaterial, GenerateEphemeralKey, Key, KeyExchange, SplitEphemeralKey};
 
-fn test_zone() {
-    type X25519XChaChaPoly1305HmacSha256 = Ecies<ec::X25519, aead::XChaCha20Poly1305, auth::HmacSha256>;
-
-    let a = X25519XChaChaPoly1305HmacSha256::new([0u8; 32]);
-    let b = X25519XChaChaPoly1305HmacSha256::generate_ephemeral_key();
-    let c = a.key_exchange(b.1);
-    let d = X25519XChaChaPoly1305HmacSha256::derive_key_material(c);
-    let e = X25519XChaChaPoly1305HmacSha256::get_enc_key(&d);
-    let f = X25519XChaChaPoly1305HmacSha256::get_mac_key(&d);
-    let g = X25519XChaChaPoly1305HmacSha256::get_nonce();
-    // encrypt(key, iv; plaintext) -> ciphertext
-    // mac(key; iv, ephemeral_ok, ciphertext; params in this order) -> mac
-}
-
-mod generics;
-pub mod ec;
-pub mod aead;
+pub mod key;
 pub mod enc;
 pub mod auth;
 
-pub struct Ecies<K, E, M> {
-    recipient_public_key: K,
-    key: PhantomData<K>,
-    enc: PhantomData<E>,
-    mac: PhantomData<M>
+pub struct Ecies<K, E, A> {
+    recipient_pk: K,
+    k: PhantomData<K>,
+    e: PhantomData<E>,
+    a: PhantomData<A>
 }
 
-trait Init<K, E, M> {
-    fn new<KeyMaterial: Into<K>>(key_material: KeyMaterial) -> Self;
-}
-
-impl<K, E, M> Init<K, E, M> for Ecies<K, E, M> {
-    fn new<KeyMaterial: Into<K>>(key_material: KeyMaterial) -> Self {
+impl<K, E, A> Ecies<K, E, A>
+{
+    pub fn new<T: Into<K>>(key: T) -> Self {
         Self {
-            recipient_public_key: key_material.into(),
-            key: PhantomData,
-            enc: PhantomData,
-            mac: PhantomData
+            recipient_pk: key.into(),
+            k: PhantomData,
+            e: PhantomData,
+            a: PhantomData
         }
     }
 }
 
-trait GenerateEphemeralKey {
-    type EphemeralPublicKey;
-    type EphemeralSecretKey;
+impl<K, E, A> Ecies<K, E, A>
+where
+    K: Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
+    E: Encryption + GenNonce + SplitEncKey,
+    A: Mac + SplitMacKey
+{
+    pub fn encrypt_mac(&self, plaintext: &[u8]) -> Vec<u8> {
+        let (ephemeral_pk, ephemeral_sk) = K::get_ephemeral_key();
+        let shared_secret = K::key_exchange(&self.recipient_pk, ephemeral_sk);
+        let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN + A::MAC_KEY_LEN);
+        let enc_key = E::get_enc_key(&mut derived_key);
+        let mac_key = A::get_mac_key(&mut derived_key);
+        let nonce = E::get_nonce();
+        let ciphertext = E::encrypt(&enc_key, &nonce, plaintext);
+        let mac = A::digest(&mac_key, &nonce, &ciphertext);
 
-    fn generate_ephemeral_key() -> (Self::EphemeralPublicKey, Self::EphemeralSecretKey);
+        let mut res = Vec::new();
+        res.extend_from_slice(ephemeral_pk.as_bytes());
+        res.extend_from_slice(nonce.as_slice());
+        res.extend_from_slice(mac.as_slice());
+        res.extend_from_slice(ciphertext.as_slice());
+
+        res
+    }
 }
 
-trait KeyExchange {
-    type EphemeralSecretKey;
+impl<K, E, A> Ecies<K, E, A>
+    where
+        K: Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
+        E: Encryption + SplitNonce + SplitEncKey,
+        A: Mac + SplitMac
+{
+    pub fn decrypt_mac<T: Into<K::SecretKey>>(sk: T, mut ciphertext: Vec<u8>) -> Vec<u8> {
+        let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
+        let nonce = E::get_nonce(&mut ciphertext);
+        let mac = A::get_mac(&mut ciphertext);
 
-    fn key_exchange(&self, ephemeral_sk: Self::EphemeralSecretKey) -> Vec<u8>;
-}
+        let shared_secret = K::key_exchange(&ephemeral_pk, sk.into());
+        let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN + A::MAC_KEY_LEN);
+        let enc_key = E::get_enc_key(&mut derived_key);
+        let mac_key = A::get_mac_key(&mut derived_key);
 
-trait Encryption {
-    const ENC_KEY_LEN: usize;
-    const ENC_NONCE_LEN: usize;
-}
+        if !A::verify(&mac_key, &nonce, &ciphertext, &mac) {
+            panic!("Invalid auth tag");
+        }
 
-trait Mac {
-    const MAC_KEY_LEN: usize;
+        E::decrypt(&enc_key, &nonce, &ciphertext)
+    }
 }

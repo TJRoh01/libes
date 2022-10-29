@@ -14,7 +14,7 @@
 
 [lib]
     name = "libes"
-    crate-type = ["dylib"]
+    crate-type = ["rlib", "dylib"]
     path = "src/lib.rs"
     test = true
     doctest = true
@@ -46,6 +46,7 @@
     zeroize = "1.5.7"
     rand_core = "0.6.4"
     sha2 = "0.10.6"
+    hkdf = "0.12.3"
     hmac = { version = "0.12.1", optional = true }
     x25519-dalek = { version = "2.0.0-pre.1", optional = true }
     ed25519-dalek = { version = "1.0.1", optional = true }
