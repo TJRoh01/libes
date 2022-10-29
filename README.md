@@ -312,10 +312,11 @@ Effort will be made to keep X, the major version, decryption backwards compatibl
 as well, but no guarantee is given. 
 
 ## Release Tracks
-- v0.1.Z: prototype
+- v0.1.Z: alpha
 - v0.(2+).Z: beta, adding algorithms
 - v1.0.0-pre.W: pre-production, refactoring, memory zeroing
-- v1.Y.Z: production, potentially backwards-incompatible refactoring, wasm support
+- v1.0.0: initial production, potentially backwards-incompatible refactoring
+- V1.(1+).Z: production, wasm support
 
 ## Conditional Compilation
 All algorithm combinations are gated behind features, to reduce how much is
