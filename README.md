@@ -38,6 +38,8 @@ In doing this I commit myself to:
   * [ECIES-MAC Flowchart](#ecies-mac-flowchart)
   * [ECIES-AEAD Flowchart](#ecies-aead-flowchart)
   * [ECIES-SYN Flowchart](#ecies-syn-flowchart)
+  * [SemVer](#semver)
+  * [Release Tracks](#release-tracks)
   * [Conditional Compilation](#conditional-compilation)
 * [Encryption Scheme Support](#encryption-scheme-support)
   * [Support icon legend](#support-icon-legend)
@@ -297,6 +299,24 @@ graph TB
     linkStyle 10 stroke:#f88379,stroke-width:2px;
 ```
 
+## SemVer
+This library respects SemVer, and guarantees decryption backwards compatibility.
+
+This means that data encrypted using library version X.Y.Z can be decrypted
+using any superseding library version as long as X is the same.
+
+For example, data encrypted using version 0.5.7 can be decrypted using version
+0.5.7 or 0.11.1, but not using versions 1.2.3, 0.5.6, or 0.4.10.
+
+Effort will be made to keep X, the major version, decryption backwards compatible
+as well, but no guarantee is given. 
+
+## Release Tracks
+- v0.1.Z: prototype
+- v0.(2+).Z: beta, adding algorithms
+- v1.0.0-pre.W: pre-production, refactoring, memory zeroing
+- v1.Y.Z: production, potentially backwards-incompatible refactoring, wasm support
+
 ## Conditional Compilation
 All algorithm combinations are gated behind features, to reduce how much is
 being compiled. Features are named exactly like the algorithm names in the
@@ -308,12 +328,9 @@ exposing high-level functionality.
 
 **NOTE:** No ECIES variants are available without activating any features,
 at minimum one of each feature categories must be activated:
-- Elliptic Curve Key (e.g. x25519)
+- Elliptic Curve (e.g. x25519)
 - Encryption (e.g. AES-GCM)
-- Variant (e.g. ECIES-AEAD)
-
-Additionally, a MAC feature (e.g. HMAC-SHA256) can be activated to enable the
-use of ECIES-MAC.
+- Authentication (e.g. ECIES-AEAD or HMAC-SHA256)
 
 # Encryption Scheme Support
 ## Support icon legend
@@ -339,7 +356,7 @@ use of ECIES-MAC.
 | XChaCha20-Poly1305 |    🏗️    |    🏗️     |    📅     |
 |      AES-GCM       |    🤔     |     🤔     |    🤔     |
 
-## MAC Support Matrix
+## Authentication Support Matrix
 |  Algorithm  | ECIES-MAC |
 |:-----------:|:---------:|
 | HMAC-SHA256 |    🏗️    |
