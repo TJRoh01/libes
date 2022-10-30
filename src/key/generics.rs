@@ -1,6 +1,8 @@
 use hkdf::Hkdf;
 use sha2::Sha256;
 
+pub struct GenericSecretKey<T>(pub(crate) T);
+
 pub trait Key {
     const EC_KEY_LEN: usize;
     type SecretKey;
@@ -9,24 +11,19 @@ pub trait Key {
 }
 
 pub trait GenerateEphemeralKey: Key + Sized {
-    fn get_ephemeral_key() -> (Self, Self::SecretKey);
+    fn get_ephemeral_key() -> (Self, GenericSecretKey<Self::SecretKey>);
 }
 
-impl<K: Key> SplitEphemeralKey for K
-    where
-        K: From<Vec<u8>>
-{
+impl<K: Key + From<Vec<u8>>> SplitEphemeralKey for K {}
+
+pub trait SplitEphemeralKey: Key + From<Vec<u8>> + Sized {
     fn get_ephemeral_key(x: &mut Vec<u8>) -> Self {
         x.drain(..Self::EC_KEY_LEN).collect::<Vec<u8>>().into()
     }
 }
 
-pub trait SplitEphemeralKey: Key + Sized {
-    fn get_ephemeral_key(x: &mut Vec<u8>) -> Self;
-}
-
 pub trait KeyExchange: Key {
-    fn key_exchange(&self, sk: Self::SecretKey) -> Vec<u8>;
+    fn key_exchange(&self, sk: GenericSecretKey<Self::SecretKey>) -> Vec<u8>;
 }
 
 impl<K: Key> DeriveKeyMaterial for K {}
