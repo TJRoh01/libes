@@ -312,11 +312,11 @@ Effort will be made to keep X, the major version, decryption backwards compatibl
 as well, but no guarantee is given. 
 
 ## Release Tracks
-- v0.1.Z: alpha
-- v0.(2+).Z: beta, adding algorithms
-- v1.0.0-pre.W: pre-production, refactoring, memory zeroing
-- v1.0.0: initial production, potentially backwards-incompatible refactoring
-- V1.(1+).Z: production, wasm support
+- v0.1.Z: alpha - initial strcuture
+- v0.(2+).Z: beta - adding algorithms
+- v1.0.0-pre.W: pre-production - refactoring & memory zeroing implementation
+- v1.0.0: initial production - potentially backwards-incompatible refactoring
+- V1.(1+).Z: production - wasm support & more
 
 ## Conditional Compilation
 All algorithm combinations are gated behind features, to reduce how much is
@@ -383,4 +383,4 @@ to be able to determine what to do without having to ask too many follow-up ques
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in this project by you, as defined in the Apache-2.0 license,
-shall be dual licensed as above , without any additional terms or conditions.
+shall be dual licensed as above, without any additional terms or conditions.
