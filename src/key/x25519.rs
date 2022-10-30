@@ -2,10 +2,32 @@ use rand_core::OsRng;
 use crate::key::generics::GenericSecretKey;
 use super::generics::{Key, GenerateEphemeralKey, KeyExchange};
 
+#[cfg(feature = "ECIES-MAC")]
+use crate::markers::EciesMacSupport;
+#[cfg(feature = "ECIES-MAC")]
+impl EciesMacSupport for X25519 {}
+
+#[cfg(feature = "ECIES-AEAD")]
+use crate::markers::EciesAeadSupport;
+#[cfg(feature = "ECIES-AEAD")]
+impl EciesAeadSupport for X25519 {}
+
+#[cfg(feature = "ECIES-SYN")]
+use crate::markers::EciesSynSupport;
+#[cfg(feature = "ECIES-SYN")]
+impl EciesSynSupport for X25519 {}
+
 pub struct X25519(x25519_dalek::PublicKey);
 
 impl From<[u8; 32]> for X25519 {
     fn from(x: [u8; 32]) -> Self { Self(x25519_dalek::PublicKey::from(x)) }
+}
+
+impl From<&[u8]> for X25519 {
+    fn from(x: &[u8]) -> Self {
+        let bytes: [u8; 32] = x.try_into().unwrap();
+        bytes.into()
+    }
 }
 
 impl From<Vec<u8>> for X25519 {
@@ -21,6 +43,13 @@ impl From<x25519_dalek::PublicKey> for X25519 {
 
 impl From<[u8; 32]> for GenericSecretKey<x25519_dalek::StaticSecret> {
     fn from(x: [u8; 32]) -> Self { Self(x25519_dalek::StaticSecret::from(x)) }
+}
+
+impl From<&[u8]> for GenericSecretKey<x25519_dalek::StaticSecret> {
+    fn from(x: &[u8]) -> Self {
+        let bytes: [u8; 32] = x.try_into().unwrap();
+        bytes.into()
+    }
 }
 
 impl From<Vec<u8>> for GenericSecretKey<x25519_dalek::StaticSecret> {
