@@ -1,13 +1,13 @@
 [package]
     name = "libes"
-    version = "0.1.3"
+    version = "0.1.4"
     authors = ["Tomas Rohatynski"]
     edition = "2021"
     rust-version = "1.60"
     description = "Collection of Elliptic Curve Integrated Encryption Scheme(s)"
     readme = "README_CRATES_IO.md"
-    homepage = "https://gitlab.com/TJRoh01/libes"
-    repository = "https://gitlab.com/TJRoh01/libes"
+    homepage = "https://github.com/TJRoh01/libes"
+    repository = "https://github.com/TJRoh01/libes"
     license = "MIT OR Apache-2.0"
     keywords = ["library", "encryption", "cypto", "ecc", "ecies"]
     categories = ["cryptography", "data-structures", "encoding", "algorithms"]
@@ -34,7 +34,7 @@
     # Encryption
     XChaCha20-Poly1305 = []
     AES-GCM = []
-    # MAC
+    # Authentication
     HMAC-SHA256 = []
     HMAC-SHA512 = []
 
