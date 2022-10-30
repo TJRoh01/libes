@@ -1,6 +1,6 @@
 use hmac::{Hmac, Mac as _};
 use sha2::Sha256;
-use super::Mac;
+use super::generics::Mac;
 
 pub struct HmacSha256;
 
