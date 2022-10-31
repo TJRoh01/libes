@@ -2,19 +2,25 @@ use rand_core::OsRng;
 use super::{PublicKeyFrom, SecretKeyFrom, generics::{Key, GenerateEphemeralKey, KeyExchange}};
 
 #[cfg(feature = "ECIES-MAC")]
-use crate::markers::EciesMacSupport;
+use crate::markers::{EciesMacEncryptionSupport, EciesMacDecryptionSupport};
 #[cfg(feature = "ECIES-MAC")]
-impl EciesMacSupport for X25519 {}
+impl EciesMacEncryptionSupport for X25519 {}
+#[cfg(feature = "ECIES-MAC")]
+impl EciesMacDecryptionSupport for X25519 {}
 
 #[cfg(feature = "ECIES-AEAD")]
-use crate::markers::EciesAeadSupport;
+use crate::markers::{EciesAeadEncryptionSupport, EciesAeadDecryptionSupport};
 #[cfg(feature = "ECIES-AEAD")]
-impl EciesAeadSupport for X25519 {}
+impl EciesAeadEncryptionSupport for X25519 {}
+#[cfg(feature = "ECIES-AEAD")]
+impl EciesAeadDecryptionSupport for X25519 {}
 
 #[cfg(feature = "ECIES-SYN")]
-use crate::markers::EciesSynSupport;
+use crate::markers::{EciesSynEncryptionSupport, EciesSynDecryptionSupport};
 #[cfg(feature = "ECIES-SYN")]
-impl EciesSynSupport for X25519 {}
+impl EciesSynEncryptionSupport for X25519 {}
+#[cfg(feature = "ECIES-SYN")]
+impl EciesSynDecryptionSupport for X25519 {}
 
 pub struct X25519(x25519_dalek::PublicKey);
 

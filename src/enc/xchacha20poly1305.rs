@@ -3,19 +3,25 @@ use chacha20poly1305::aead::{Aead, Payload};
 use super::generics::Encryption;
 
 #[cfg(feature = "ECIES-MAC")]
-use crate::markers::EciesMacSupport;
+use crate::markers::{EciesMacEncryptionSupport, EciesMacDecryptionSupport};
 #[cfg(feature = "ECIES-MAC")]
-impl EciesMacSupport for XChaCha20Poly1305 {}
+impl EciesMacEncryptionSupport for XChaCha20Poly1305 {}
+#[cfg(feature = "ECIES-MAC")]
+impl EciesMacDecryptionSupport for XChaCha20Poly1305 {}
 
 #[cfg(feature = "ECIES-AEAD")]
-use crate::markers::EciesAeadSupport;
+use crate::markers::{EciesAeadEncryptionSupport, EciesAeadDecryptionSupport};
 #[cfg(feature = "ECIES-AEAD")]
-impl EciesAeadSupport for XChaCha20Poly1305 {}
+impl EciesAeadEncryptionSupport for XChaCha20Poly1305 {}
+#[cfg(feature = "ECIES-AEAD")]
+impl EciesAeadDecryptionSupport for XChaCha20Poly1305 {}
 
 #[cfg(feature = "ECIES-SYN")]
-use crate::markers::EciesSynSupport;
+use crate::markers::{EciesSynEncryptionSupport, EciesSynDecryptionSupport};
 #[cfg(feature = "ECIES-SYN")]
-impl EciesSynSupport for XChaCha20Poly1305 {}
+impl EciesSynEncryptionSupport for XChaCha20Poly1305 {}
+#[cfg(feature = "ECIES-SYN")]
+impl EciesSynDecryptionSupport for XChaCha20Poly1305 {}
 
 pub struct XChaCha20Poly1305;
 
