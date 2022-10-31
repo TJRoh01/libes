@@ -9,6 +9,8 @@
 
 The goal of this is library is to become a one-stop shop for everything ECIES.
 
+For code documentation, usage explanations, and examples please see [Docs.rs](https://docs.rs/libes/latest/libes/).
+
 ## Why use libes?
 The rust cryptography ecosystem is swarming with crates, with varying degrees
 of quality and documentation. I have taken it onto myself to navigate this,
@@ -151,7 +153,7 @@ and Authentication algorithms must all support the same ECIES variant.
 - To use ECIES-AEAD or ECIES-SYN both first two algorithms need a "🚀" in the variant column
 
 # Algorithm support
-Matrix entries are of form Encryption/Decryption
+Matrix entries are of form `Encryption & Decryption` or `Encryption`/`Decryption`
 
 ## Support icon legend
 - 🚀 Completed
@@ -161,27 +163,27 @@ Matrix entries are of form Encryption/Decryption
 - 🚫 Can/Will not implement
 
 ## Elliptic Curve Support Matrix
-|     Algorithm     | ECIES-MAC | ECIES-AEAD | ECIES-SYN |
-|:-----------------:|:---------:|:----------:|:---------:|
-|      x25519       |   🚀/🚀   |   🚀/🚀    |   🚀/🚀   |
-|      ed25519      |  🏗️/🏗️  |  🏗️/🏗️   |  🏗️/🏗️  |
-| K-256 / secp256k1 |   🤔/🤔   |   🤔/🤔    |   🤔/🤔   |
-| P-256 / secp256r1 |   🤔/🤔   |   🤔/🤔    |   🤔/🤔   |
-| P-384 / secp384r1 |   🤔/🤔   |   🤔/🤔    |   🤔/🤔   |
-| P-521 / secp521r1 |   🤔/🤔   |   🤔/🤔    |   🤔/🤔   |
+| Algorithm/ECIES Variant | ECIES-MAC | ECIES-AEAD | ECIES-SYN |
+|:-----------------------:|:---------:|:----------:|:---------:|
+|         x25519          |    🚀     |     🚀     |    🚀     |
+|         ed25519         |   🏗️️    |    /🏗️    |    🏗️    |
+|    K-256 / secp256k1    |    📅     |     📅     |    📅     |
+|    P-256 / secp256r1    |    📅     |     📅     |    📅     |
+|    P-384 / secp384r1    |    🤔     |     🤔     |    🤔     |
+|    P-521 / secp521r1    |    🤔     |     🤔     |    🤔     |
 
 ## Encryption Support Matrix
-|     Algorithm      |   ECIES-MAC   |  ECIES-AEAD   |   ECIES-SYN   |
-|:------------------:|:-------------:|:-------------:|:-------------:|
-| ChaCha20-Poly1305  | 🚫[^1]/🚫[^2] | 🚫[^1]/🚫[^2] | 🚫[^1]/🚫[^2] |
-| XChaCha20-Poly1305 |     🚀/🚀     |     🚀/🚀     |     🚀/🚀     |
-|      AES-GCM       |     🤔/🤔     |     🤔/🤔     |     🤔/🤔     |
+| Algorithm/ECIES Variant |   ECIES-MAC   |  ECIES-AEAD   |   ECIES-SYN   |
+|:-----------------------:|:-------------:|:-------------:|:-------------:|
+|    ChaCha20-Poly1305    | 🚫[^1]/🚫[^2] | 🚫[^1]/🚫[^2] | 🚫[^1]/🚫[^2] |
+|   XChaCha20-Poly1305    |      🚀       |      🚀       |      🚀       |
+|         AES-GCM         |      📅       |      📅       |      📅       |
 
 ## Authentication Support Matrix
-|  Algorithm  | ECIES-MAC |
-|:-----------:|:---------:|
-| HMAC-SHA256 |   🚀/🚀   |
-| HMAC-SHA512 |   🤔/🤔   |
+| Algorithm/ECIES Variant | ECIES-MAC |
+|:-----------------------:|:---------:|
+|       HMAC-SHA256       |    🚀     |
+|       HMAC-SHA512       |    🤔     |
 
 [^1]: ChaCha20 uses a 96-bit nonce,
 which when generated using a random function has an unsatisfactory

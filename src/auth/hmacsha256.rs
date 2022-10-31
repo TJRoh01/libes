@@ -2,6 +2,9 @@ use hmac::{Hmac, Mac as _};
 use sha2::Sha256;
 use super::generics::Mac;
 
+/// Marker for using the `ECIES-MAC` variant with the `HMAC-SHA256` algorithm for authentication
+///
+/// HMAC-SHA256 is provided by [hmac](https://crates.io/crates/hmac) and [sha2](https://crates.io/crates/sha2)
 pub struct HmacSha256;
 
 impl Mac for HmacSha256 {
