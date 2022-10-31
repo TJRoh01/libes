@@ -43,7 +43,6 @@
     HMAC-SHA512 = ["dep:hmac"]
 
 [dependencies]
-    zeroize = "1.5.7"
     rand_core = { version = "0.6.4", features = ["getrandom"] }
     sha2 = "0.10.6"
     hkdf = "0.12.3"
