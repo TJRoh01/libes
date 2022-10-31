@@ -25,7 +25,7 @@ use auth::Syn;
 use enc::generics::GenNonce;
 
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
-use key::{IntoSecretKey, generics::{DeriveKeyMaterial, GenerateEphemeralKey, Key, KeyExchange, SplitEphemeralKey}};
+use key::{IntoPublicKey, IntoSecretKey, generics::{DeriveKeyMaterial, GenerateEphemeralKey, Key, KeyExchange, SplitEphemeralKey}};
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
 use enc::generics::{Encryption, SplitEncKey, SplitNonce};
 
@@ -38,11 +38,10 @@ pub struct Ecies<K, E, A> {
     a: PhantomData<A>
 }
 
-impl<K, E, A> Ecies<K, E, A>
-{
-    pub fn new<T: Into<K>>(key: T) -> Self {
+impl<K: Key, E, A> Ecies<K, E, A> {
+    pub fn new<T: IntoPublicKey<K>>(key: T) -> Self {
         Self {
-            recipient_pk: key.into(),
+            recipient_pk: key.into_pk(),
             k: PhantomData,
             e: PhantomData,
             a: PhantomData

@@ -1,6 +1,5 @@
 use rand_core::OsRng;
-use x25519_dalek::StaticSecret;
-use super::{SecretKeyFrom, generics::{Key, GenerateEphemeralKey, KeyExchange}};
+use super::{PublicKeyFrom, SecretKeyFrom, generics::{Key, GenerateEphemeralKey, KeyExchange}};
 
 #[cfg(feature = "ECIES-MAC")]
 use crate::markers::EciesMacSupport;
@@ -19,26 +18,26 @@ impl EciesSynSupport for X25519 {}
 
 pub struct X25519(x25519_dalek::PublicKey);
 
-impl From<[u8; 32]> for X25519 {
-    fn from(x: [u8; 32]) -> Self { Self(x25519_dalek::PublicKey::from(x)) }
+impl PublicKeyFrom<[u8; 32]> for X25519 {
+    fn pk_from(x: [u8; 32]) -> Self { Self(x25519_dalek::PublicKey::from(x)) }
 }
 
-impl From<&[u8]> for X25519 {
-    fn from(x: &[u8]) -> Self {
+impl PublicKeyFrom<&[u8]> for X25519 {
+    fn pk_from(x: &[u8]) -> Self {
         let bytes: [u8; 32] = x.try_into().unwrap();
-        bytes.into()
+        X25519::pk_from(bytes)
     }
 }
 
-impl From<Vec<u8>> for X25519 {
-    fn from(x: Vec<u8>) -> Self {
+impl PublicKeyFrom<Vec<u8>> for X25519 {
+    fn pk_from(x: Vec<u8>) -> Self {
         let bytes: [u8; 32] = x.try_into().unwrap();
-        bytes.into()
+        X25519::pk_from(bytes)
     }
 }
 
-impl From<x25519_dalek::PublicKey> for X25519 {
-    fn from(x: x25519_dalek::PublicKey) -> Self { Self(x) }
+impl PublicKeyFrom<x25519_dalek::PublicKey> for X25519 {
+    fn pk_from(x: x25519_dalek::PublicKey) -> Self { Self(x) }
 }
 
 impl SecretKeyFrom<[u8; 32]> for X25519 {
@@ -50,20 +49,19 @@ impl SecretKeyFrom<[u8; 32]> for X25519 {
 impl SecretKeyFrom<&[u8]> for X25519 {
     fn sk_from(x: &[u8]) -> Self::SecretKey {
         let bytes: [u8; 32] = x.try_into().unwrap();
-        bytes.into()
+        X25519::sk_from(bytes)
     }
 }
 
 impl SecretKeyFrom<Vec<u8>> for X25519 {
     fn sk_from(x: Vec<u8>) -> Self::SecretKey {
         let bytes: [u8; 32] = x.try_into().unwrap();
-        bytes.into()
+        X25519::sk_from(bytes)
     }
 }
 
-
 impl SecretKeyFrom<x25519_dalek::StaticSecret> for X25519 {
-    fn sk_from(x: StaticSecret) -> Self::SecretKey { x }
+    fn sk_from(x: x25519_dalek::StaticSecret) -> Self::SecretKey { x }
 }
 
 impl Key for X25519 {
