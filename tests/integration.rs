@@ -17,7 +17,7 @@ fn x25519_xchachapoly1305_hmacsha256() {
     let sk_bytes = sk.to_bytes();
     let pk_bytes = pk.to_bytes();
 
-    let enc = X25519XChaCha20Poly1305HmacSha256::new(pk_bytes.clone());
+    let enc = X25519XChaCha20Poly1305HmacSha256::new(pk_bytes.clone()).expect("");
     let ciphertext = enc.encrypt(LOREM_IPSUM);
 
     let plaintext = X25519XChaCha20Poly1305HmacSha256::decrypt(sk_bytes.clone(), &ciphertext);
@@ -35,7 +35,7 @@ fn x25519_xchachapoly1305_aead() {
     let sk_bytes = sk.to_bytes();
     let pk_bytes = pk.to_bytes();
 
-    let enc = X25519XChaCha20Poly1305Aead::new(pk_bytes.clone());
+    let enc = X25519XChaCha20Poly1305Aead::new(pk_bytes.clone()).expect("");
     let ciphertext = enc.encrypt(LOREM_IPSUM);
 
     let plaintext = X25519XChaCha20Poly1305Aead::decrypt(sk_bytes.clone(), &ciphertext);
@@ -53,7 +53,7 @@ fn x25519_xchachapoly1305_syn() {
     let sk_bytes = sk.to_bytes();
     let pk_bytes = pk.to_bytes();
 
-    let enc = X25519XChaCha20Poly1305Syn::new(pk_bytes.clone());
+    let enc = X25519XChaCha20Poly1305Syn::new(pk_bytes.clone()).expect("");
     let ciphertext = enc.encrypt(LOREM_IPSUM);
 
     let plaintext = X25519XChaCha20Poly1305Syn::decrypt(sk_bytes.clone(), &ciphertext);

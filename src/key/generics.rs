@@ -1,6 +1,6 @@
 use hkdf::Hkdf;
 use sha2::Sha256;
-use super::PublicKeyFrom;
+use super::TryPublicKeyFrom;
 
 pub trait Key {
     const EC_KEY_LEN: usize;
@@ -13,11 +13,11 @@ pub trait GenerateEphemeralKey: Key + Sized {
     fn get_ephemeral_key() -> (Self, Self::SecretKey);
 }
 
-impl<K: PublicKeyFrom<Vec<u8>> + Key> SplitEphemeralKey for K {}
+impl<K: TryPublicKeyFrom<Vec<u8>> + Key> SplitEphemeralKey for K {}
 
-pub trait SplitEphemeralKey: PublicKeyFrom<Vec<u8>> + Key + Sized {
+pub trait SplitEphemeralKey: TryPublicKeyFrom<Vec<u8>> + Key + Sized {
     fn get_ephemeral_key(x: &mut Vec<u8>) -> Self {
-        Self::pk_from(x.drain(..Self::EC_KEY_LEN).collect::<Vec<u8>>())
+        Self::try_pk_from(x.drain(..Self::EC_KEY_LEN).collect::<Vec<u8>>()).unwrap()
     }
 }
 
