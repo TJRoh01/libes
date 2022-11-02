@@ -122,46 +122,50 @@
 //! [^2]: Will not encourage using potentially weak encryption [^1]
 //! by implementing decryption for it
 
-pub mod markers;
-pub mod key;
-pub mod enc;
 pub mod auth;
+pub mod enc;
+pub mod key;
+pub mod markers;
 
 #[cfg(not(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN")))]
-compile_error!("At least one variant feature must be activated: 'ECIES-MAC', 'ECIES_AEAD', or 'ECIES-SYN'");
+compile_error!(
+    "At least one variant feature must be activated: 'ECIES-MAC', 'ECIES_AEAD', or 'ECIES-SYN'"
+);
 
-#[cfg(feature = "ECIES-MAC")]
-use markers::{EciesMacEncryptionSupport, EciesMacDecryptionSupport};
 #[cfg(feature = "ECIES-MAC")]
 use auth::generics::{Mac, SplitMac, SplitMacKey};
+#[cfg(feature = "ECIES-MAC")]
+use markers::{EciesMacDecryptionSupport, EciesMacEncryptionSupport};
 
-#[cfg(feature = "ECIES-AEAD")]
-use markers::{EciesAeadEncryptionSupport, EciesAeadDecryptionSupport};
 #[cfg(feature = "ECIES-AEAD")]
 use auth::Aead;
+#[cfg(feature = "ECIES-AEAD")]
+use markers::{EciesAeadDecryptionSupport, EciesAeadEncryptionSupport};
 
 #[cfg(feature = "ECIES-SYN")]
-use markers::{EciesSynEncryptionSupport, EciesSynDecryptionSupport};
-#[cfg(feature = "ECIES-SYN")]
 use auth::Syn;
+#[cfg(feature = "ECIES-SYN")]
+use markers::{EciesSynDecryptionSupport, EciesSynEncryptionSupport};
 
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD"))]
 use enc::generics::GenNonce;
 
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
-use key::generics::{TryIntoSecretKey, DeriveKeyMaterial, GenerateEphemeralKey, KeyExchange, SplitEphemeralKey};
-#[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
 use enc::generics::{Encryption, SplitEncKey, SplitNonce};
+#[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
+use key::generics::{
+    DeriveKeyMaterial, GenerateEphemeralKey, KeyExchange, SplitEphemeralKey, TryIntoSecretKey,
+};
 
+use key::generics::{Key, TryIntoPublicKey};
 use std::marker::PhantomData;
-use key::generics::{TryIntoPublicKey, Key};
 
 /// Generic `ECIES` instance
 pub struct Ecies<K, E, A> {
     recipient_pk: K,
     k: PhantomData<K>,
     e: PhantomData<E>,
-    a: PhantomData<A>
+    a: PhantomData<A>,
 }
 
 impl<K: Key, E, A> Ecies<K, E, A> {
@@ -171,7 +175,7 @@ impl<K: Key, E, A> Ecies<K, E, A> {
             recipient_pk: recipient_public_key.try_into_pk()?,
             k: PhantomData,
             e: PhantomData,
-            a: PhantomData
+            a: PhantomData,
         })
     }
 }
@@ -181,7 +185,7 @@ impl<K, E, A> Ecies<K, E, A>
 where
     K: EciesMacEncryptionSupport + Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
     E: EciesMacEncryptionSupport + Encryption + GenNonce + SplitEncKey,
-    A: Mac + SplitMacKey
+    A: Mac + SplitMacKey,
 {
     /// Encrypt `plaintext` using the `ECIES-MAC` variant
     pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
@@ -191,7 +195,11 @@ where
 
         // Derive
         let shared_secret = K::key_exchange(&self.recipient_pk, ephemeral_sk);
-        let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN + A::MAC_KEY_LEN);
+        let mut derived_key = K::derive_key_material(
+            &ephemeral_pk,
+            shared_secret,
+            E::ENC_KEY_LEN + A::MAC_KEY_LEN,
+        );
         let enc_key = E::get_enc_key(&mut derived_key);
         let mac_key = A::get_mac_key(&mut derived_key);
 
@@ -215,11 +223,14 @@ impl<K, E, A> Ecies<K, E, A>
 where
     K: EciesMacDecryptionSupport + Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
     E: EciesMacDecryptionSupport + Encryption + SplitNonce + SplitEncKey,
-    A: Mac + SplitMac
+    A: Mac + SplitMac,
 {
     /// Decrypt `ciphertext` using the `ECIES-MAC` variant, given the `recipient_secret_key` it was
     /// encrypted for
-    pub fn decrypt<T: TryIntoSecretKey<K>>(recipient_secret_key: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
+    pub fn decrypt<T: TryIntoSecretKey<K>>(
+        recipient_secret_key: T,
+        ciphertext: &[u8],
+    ) -> Result<Vec<u8>, ()> {
         let mut ciphertext = ciphertext.to_vec();
 
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
@@ -227,7 +238,11 @@ where
         let mac = A::get_mac(&mut ciphertext);
 
         let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.try_into_sk()?);
-        let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN + A::MAC_KEY_LEN);
+        let mut derived_key = K::derive_key_material(
+            &ephemeral_pk,
+            shared_secret,
+            E::ENC_KEY_LEN + A::MAC_KEY_LEN,
+        );
         let enc_key = E::get_enc_key(&mut derived_key);
         let mac_key = A::get_mac_key(&mut derived_key);
 
@@ -240,7 +255,7 @@ where
 impl<K, E> Ecies<K, E, Aead>
 where
     K: EciesAeadEncryptionSupport + Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
-    E: EciesAeadEncryptionSupport + Encryption + GenNonce + SplitEncKey
+    E: EciesAeadEncryptionSupport + Encryption + GenNonce + SplitEncKey,
 {
     /// Encrypt `plaintext` using the `ECIES-AEAD` variant
     pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
@@ -270,11 +285,14 @@ where
 impl<K, E> Ecies<K, E, Aead>
 where
     K: EciesAeadDecryptionSupport + Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
-    E: EciesAeadDecryptionSupport + Encryption + SplitNonce + SplitEncKey
+    E: EciesAeadDecryptionSupport + Encryption + SplitNonce + SplitEncKey,
 {
     /// Decrypt `ciphertext` using the `ECIES-AEAD` variant, given the `recipient_secret_key` it was
     /// encrypted for
-    pub fn decrypt<T: TryIntoSecretKey<K>>(recipient_secret_key: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
+    pub fn decrypt<T: TryIntoSecretKey<K>>(
+        recipient_secret_key: T,
+        ciphertext: &[u8],
+    ) -> Result<Vec<u8>, ()> {
         let mut ciphertext = ciphertext.to_vec();
 
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
@@ -292,7 +310,7 @@ where
 impl<K, E> Ecies<K, E, Syn>
 where
     K: EciesSynEncryptionSupport + Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
-    E: EciesSynEncryptionSupport + Encryption + SplitNonce + SplitEncKey
+    E: EciesSynEncryptionSupport + Encryption + SplitNonce + SplitEncKey,
 {
     /// Encrypt `plaintext` using the `ECIES-SYN` variant
     pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
@@ -301,7 +319,11 @@ where
 
         // Derive
         let shared_secret = K::key_exchange(&self.recipient_pk, ephemeral_sk);
-        let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN + E::ENC_NONCE_LEN);
+        let mut derived_key = K::derive_key_material(
+            &ephemeral_pk,
+            shared_secret,
+            E::ENC_KEY_LEN + E::ENC_NONCE_LEN,
+        );
         let enc_key = E::get_enc_key(&mut derived_key);
         let nonce = E::get_nonce(&mut derived_key);
 
@@ -321,17 +343,24 @@ where
 impl<K, E> Ecies<K, E, Syn>
 where
     K: EciesSynDecryptionSupport + Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
-    E: EciesSynDecryptionSupport + Encryption + SplitNonce + SplitEncKey
+    E: EciesSynDecryptionSupport + Encryption + SplitNonce + SplitEncKey,
 {
     /// Decrypt `ciphertext` using the `ECIES-SYN` variant, given the `recipient_secret_key` it was
     /// encrypted for
-    pub fn decrypt<T: TryIntoSecretKey<K>>(recipient_secret_key: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
+    pub fn decrypt<T: TryIntoSecretKey<K>>(
+        recipient_secret_key: T,
+        ciphertext: &[u8],
+    ) -> Result<Vec<u8>, ()> {
         let mut ciphertext = ciphertext.to_vec();
 
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
 
         let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.try_into_sk()?);
-        let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN + E::ENC_NONCE_LEN);
+        let mut derived_key = K::derive_key_material(
+            &ephemeral_pk,
+            shared_secret,
+            E::ENC_KEY_LEN + E::ENC_NONCE_LEN,
+        );
         let enc_key = E::get_enc_key(&mut derived_key);
         let nonce = E::get_nonce(&mut derived_key);
 

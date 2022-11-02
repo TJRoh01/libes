@@ -1,6 +1,6 @@
+use super::generics::Mac;
 use hmac::{Hmac, Mac as _};
 use sha2::Sha256;
-use super::generics::Mac;
 
 /// Marker for using the `ECIES-MAC` variant with the `HMAC-SHA256` algorithm for authentication
 ///
