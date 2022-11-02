@@ -92,27 +92,27 @@
 //! - 🚫 Can/Will not implement
 //!
 //! ### Elliptic Curve Support Matrix
-//! |     Algorithm/ECIES Variant     | ECIES-MAC | ECIES-AEAD | ECIES-SYN |
-//! |:-----------------:|:---------:|:----------:|:---------:|
-//! |      x25519       |    🚀    |    🚀     |    🚀     |
-//! |      ed25519      |    🏗️️    |    /🏗️     |    🏗️      |
-//! | K-256 / secp256k1 |    📅     |     📅     |    📅     |
-//! | P-256 / secp256r1 |    📅     |     📅     |    📅     |
-//! | P-384 / secp384r1 |    🤔     |     🤔     |    🤔     |
-//! | P-521 / secp521r1 |    🤔     |     🤔     |    🤔     |
+//! | Algorithm/ECIES Variant | ECIES-MAC | ECIES-AEAD | ECIES-SYN |
+//! |:-----------------------:|:---------:|:----------:|:---------:|
+//! |         x25519          |    🚀     |     🚀     |    🚀     |
+//! |         ed25519         |   🏗️️    |    🏗️     |    🏗️    |
+//! |    K-256 / secp256k1    |    📅     |     📅     |    📅     |
+//! |    P-256 / secp256r1    |    📅     |     📅     |    📅     |
+//! |    P-384 / secp384r1    |    🤔     |     🤔     |    🤔     |
+//! |    P-521 / secp521r1    |    🤔     |     🤔     |    🤔     |
 //!
 //! ### Encryption Support Matrix
-//! |     Algorithm/ECIES Variant      | ECIES-MAC | ECIES-AEAD | ECIES-SYN |
-//! |:------------------:|:---------:|:----------:|:---------:|
-//! | ChaCha20-Poly1305  |  🚫[^1]/🚫[^2]   |   🚫[^1]/🚫[^2]   |  🚫[^1]/🚫[^2]   |
-//! | XChaCha20-Poly1305 |    🚀    |    🚀     |    🚀     |
-//! |      AES-GCM       |    📅    |     📅     |    📅     |
+//! | Algorithm/ECIES Variant |   ECIES-MAC   |  ECIES-AEAD   |   ECIES-SYN   |
+//! |:-----------------------:|:-------------:|:-------------:|:-------------:|
+//! |    ChaCha20-Poly1305    | 🚫[^1]/🚫[^2] | 🚫[^1]/🚫[^2] | 🚫[^1]/🚫[^2] |
+//! |   XChaCha20-Poly1305    |      🚀       |      🚀       |      🚀       |
+//! |         AES-GCM         |      📅       |      📅       |      📅       |
 //!
 //! ### Authentication Support Matrix
-//! |  Algorithm/ECIES Variant  | ECIES-MAC |
-//! |:-----------:|:---------:|
-//! | HMAC-SHA256 |    🚀    |
-//! | HMAC-SHA512 |    🤔     |
+//! | Algorithm/ECIES Variant | ECIES-MAC |
+//! |:-----------------------:|:---------:|
+//! |       HMAC-SHA256       |    🚀     |
+//! |       HMAC-SHA512       |    🤔     |
 //!
 //! [^1]: ChaCha20 uses a 96-bit nonce,
 //! which when generated using a random function has an unsatisfactory
