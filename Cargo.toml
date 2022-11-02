@@ -1,6 +1,6 @@
 [package]
     name = "libes"
-    version = "0.1.6"
+    version = "0.1.7"
     authors = ["Tomas Rohatynski"]
     edition = "2021"
     rust-version = "1.60"
@@ -11,6 +11,9 @@
     license = "MIT OR Apache-2.0"
     keywords = ["library", "encryption", "cypto", "ecc", "ecies"]
     categories = ["cryptography", "data-structures", "encoding", "algorithms"]
+
+[package.metadata.docs.rs]
+    all-features = true
 
 [lib]
     name = "libes"
