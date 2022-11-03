@@ -12,6 +12,11 @@
 //! For project details like ECIES variant flowcharts, explanations, license, and release tracks
 //! please see the README.md on [GitHub](https://github.com/TJRoh01/libes/blob/main/README.md).
 //!
+//! ## ⚠️ Alpha Release Track - Not Production Ready ⚠️
+//! During alpha development, versions 0.1.Z, there is no guarantee of backwards compatibility and
+//! the API can change at any time. If you decide to use this library at this time, make sure that
+//! you always use the latest version, and be prepared to update your usage of the library often.
+//!
 //! ## The mechanics of libes
 //! Internally, libes is built up using generics. This allows the library to add support for
 //! algorithms with only a couple lines of code per algorithm to glue the dependency providing that
@@ -49,7 +54,7 @@
 //! 5. We enable the corresponding features for the libes dependency to compile our chosen functionality
 //!     - ```toml
 //!       [dependencies.libes]
-//!       version = "*"
+//!       version = "*" # For the Alpha Release Track, always use the latest version
 //!       features = ["ECIES-AEAD", "x25519", "XChaCha20-Poly1305"]
 //!       ```
 //!
