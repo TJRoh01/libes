@@ -46,7 +46,7 @@
 //! - [EciesAeadEncryptionSupport]/[EciesAeadDecryptionSupport] if `A` is [Aead][auth::Aead]
 //! - [EciesSynEncryptionSupport]/[EciesSynDecryptionSupport] if `A` is [Syn][auth::Syn]
 //!
-//! ## Example usage
+//! ## Short usage guide
 //! 1. We decide that we want to use the `ECIES-AEAD` variant
 //! 2. We need to choose an **Elliptic Curve** algorithm from [key] and an **Encryption** algorithm from [enc] that are compatible with `ECIES-AEAD`
 //! 3. Both [key::X25519] and [enc::XChaCha20Poly1305] implement [EciesAeadEncryptionSupport] and [EciesAeadDecryptionSupport], so we can choose to use those algorithms
@@ -58,30 +58,109 @@
 //!       features = ["ECIES-AEAD", "x25519", "XChaCha20-Poly1305"]
 //!       ```
 //!
-//! And now for the code:
+//! ## Code example
+//! ### Receiver
 //! ```rust
 //! # fn main() -> Result<(), ()> {
-//! use libes::{auth, Ecies, enc, key};
-//!
+//! # use libes::{auth, Ecies, enc, key};
 //! // Create an alias for Ecies with our chosen algorithms
 //! type MyEcies = Ecies<key::X25519, enc::XChaCha20Poly1305, auth::Aead>;
 //!
-//! // Alice generates a elliptic key pair, then sends the public key to Bob
-//! let alice_secret_key = x25519_dalek::StaticSecret::new(rand_core::OsRng);
-//! let alice_public_key = x25519_dalek::PublicKey::from(&alice_secret_key);
+//! // Generate an appropriate elliptic key pair
+//! let secret_key = x25519_dalek::StaticSecret::new(rand_core::OsRng);
+//! let public_key = x25519_dalek::PublicKey::from(&secret_key);
 //!
-//! // Bob receives the public key, and instantiates MyEcies with it
-//! let encryptor = MyEcies::new(alice_public_key)?;
+//! // Convert public_key to bytes
+//! let public_key_bytes = public_key.to_bytes().to_vec();
 //!
-//! // Then Bob encrypts his message, and sends it to Alice
-//! let message = b"Hello Alice";
+//! // Send public_key_bytes to the message sender
+//! #
+//! # // Instantiate Ecies using the received public_key_bytes
+//! # let encryptor = MyEcies::try_new(public_key_bytes)?;
+//! #
+//! # // Encrypt the message
+//! # let message = b"Hello Alice, this is Bob.";
+//! # let encrypted_message = encryptor.encrypt(message);
+//! #
+//! # // Send encrypted_message to the message recipient
+//! #
+//! # // Decrypt the message
+//! # let decrypted_message = MyEcies::decrypt(secret_key, &encrypted_message)?;
+//! #
+//! # assert_eq!(message.to_vec(), decrypted_message);
+//! #
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! \~~~ _Network_ \~~~
+//!
+//! ### Sender
+//! ```rust
+//! # fn main() -> Result<(), ()> {
+//! # use libes::{auth, Ecies, enc, key};
+//! // Create an alias for Ecies with our chosen algorithms
+//! type MyEcies = Ecies<key::X25519, enc::XChaCha20Poly1305, auth::Aead>;
+//!
+//! # // Generate a elliptic key pair
+//! # let secret_key = x25519_dalek::StaticSecret::new(rand_core::OsRng);
+//! # let public_key = x25519_dalek::PublicKey::from(&secret_key);
+//! #
+//! # // Convert public_key to bytes
+//! # let public_key_bytes = public_key.to_bytes().to_vec();
+//! #
+//! # // Send public_key_bytes to the message sender
+//! #
+//! // Instantiate Ecies using the received public_key_bytes
+//! let encryptor = MyEcies::try_new(public_key_bytes)?;
+//!
+//! // Encrypt the message
+//! let message = b"Hello Alice, this is Bob.";
 //! let encrypted_message = encryptor.encrypt(message);
 //!
-//! // Alice receives the encrypted message, and decrypts it using MyEcies and her secret key
-//! let decrypted_message = MyEcies::decrypt(alice_secret_key, &encrypted_message)?;
+//! // Send encrypted_message to the message recipient
+//! #
+//! # // Decrypt the message
+//! # let decrypted_message = MyEcies::decrypt(secret_key, &encrypted_message)?;
+//! #
+//! # assert_eq!(message.to_vec(), decrypted_message);
+//! #
+//! # Ok(())
+//! # }
+//! ```
 //!
-//! // The decrypted message equals the original message
-//! assert_eq!(message, decrypted_message.as_slice());
+//! \~~~ _Network_ \~~~
+//!
+//! ### Receiver
+//! ```rust
+//! # fn main() -> Result<(), ()> {
+//! # use libes::{auth, Ecies, enc, key};
+//! // Create an alias for Ecies with our chosen algorithms
+//! type MyEcies = Ecies<key::X25519, enc::XChaCha20Poly1305, auth::Aead>;
+//!
+//! # // Generate a elliptic key pair
+//! # let secret_key = x25519_dalek::StaticSecret::new(rand_core::OsRng);
+//! # let public_key = x25519_dalek::PublicKey::from(&secret_key);
+//! #
+//! # // Convert public_key to bytes
+//! # let public_key_bytes = public_key.to_bytes().to_vec();
+//! #
+//! # // Send public_key_bytes to the message sender
+//! #
+//! # // Instantiate Ecies using the received public_key_bytes
+//! # let encryptor = MyEcies::try_new(public_key_bytes)?;
+//! #
+//! # // Encrypt the message
+//! # let message = b"Hello Alice, this is Bob.";
+//! # let encrypted_message = encryptor.encrypt(message);
+//! #
+//! # // Send encrypted_message to the message recipient
+//! #
+//! // Decrypt the message
+//! let decrypted_message = MyEcies::decrypt(secret_key, &encrypted_message)?;
+//! #
+//! # assert_eq!(message.to_vec(), decrypted_message);
+//! #
 //! # Ok(())
 //! # }
 //! ```
@@ -158,11 +237,13 @@ use enc::generics::GenNonce;
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
 use enc::generics::{Encryption, SplitEncKey, SplitNonce};
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
-use key::generics::{
-    DeriveKeyMaterial, GenerateEphemeralKey, KeyExchange, SplitEphemeralKey, TryIntoSecretKey,
-};
+use key::conversion::IntoSecretKey;
+#[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
+use key::generics::{DeriveKeyMaterial, GenerateEphemeralKey, KeyExchange, SplitEphemeralKey};
 
-use key::generics::{Key, TryIntoPublicKey};
+use crate::key::conversion::TryIntoPublicKey;
+use key::conversion::IntoPublicKey;
+use key::generics::Key;
 use std::marker::PhantomData;
 
 /// Generic `ECIES` instance
@@ -175,13 +256,17 @@ pub struct Ecies<K, E, A> {
 
 impl<K: Key, E, A> Ecies<K, E, A> {
     /// Create a new `ECIES<K, E, A>` instance given a `recipient_public_key` compatible with `K`
-    pub fn new<T: TryIntoPublicKey<K>>(recipient_public_key: T) -> Result<Self, ()> {
-        Ok(Self {
-            recipient_pk: recipient_public_key.try_into_pk()?,
+    pub fn new<T: IntoPublicKey<K>>(recipient_public_key: T) -> Self {
+        Self {
+            recipient_pk: recipient_public_key.into_pk(),
             k: PhantomData,
             e: PhantomData,
             a: PhantomData,
-        })
+        }
+    }
+
+    pub fn try_new<T: TryIntoPublicKey<K>>(recipient_public_key: T) -> Result<Self, ()> {
+        Ok(Self::new(recipient_public_key.try_into_pk()?))
     }
 }
 
@@ -232,7 +317,7 @@ where
 {
     /// Decrypt `ciphertext` using the `ECIES-MAC` variant, given the `recipient_secret_key` it was
     /// encrypted for
-    pub fn decrypt<T: TryIntoSecretKey<K>>(
+    pub fn decrypt<T: IntoSecretKey<K>>(
         recipient_secret_key: T,
         ciphertext: &[u8],
     ) -> Result<Vec<u8>, ()> {
@@ -242,7 +327,7 @@ where
         let nonce = E::get_nonce(&mut ciphertext);
         let mac = A::get_mac(&mut ciphertext);
 
-        let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.try_into_sk()?);
+        let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.into_sk());
         let mut derived_key = K::derive_key_material(
             &ephemeral_pk,
             shared_secret,
@@ -294,7 +379,7 @@ where
 {
     /// Decrypt `ciphertext` using the `ECIES-AEAD` variant, given the `recipient_secret_key` it was
     /// encrypted for
-    pub fn decrypt<T: TryIntoSecretKey<K>>(
+    pub fn decrypt<T: IntoSecretKey<K>>(
         recipient_secret_key: T,
         ciphertext: &[u8],
     ) -> Result<Vec<u8>, ()> {
@@ -303,7 +388,7 @@ where
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
         let nonce = E::get_nonce(&mut ciphertext);
 
-        let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.try_into_sk()?);
+        let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.into_sk());
         let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN);
         let enc_key = E::get_enc_key(&mut derived_key);
 
@@ -352,7 +437,7 @@ where
 {
     /// Decrypt `ciphertext` using the `ECIES-SYN` variant, given the `recipient_secret_key` it was
     /// encrypted for
-    pub fn decrypt<T: TryIntoSecretKey<K>>(
+    pub fn decrypt<T: IntoSecretKey<K>>(
         recipient_secret_key: T,
         ciphertext: &[u8],
     ) -> Result<Vec<u8>, ()> {
@@ -360,7 +445,7 @@ where
 
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
 
-        let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.try_into_sk()?);
+        let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.into_sk());
         let mut derived_key = K::derive_key_material(
             &ephemeral_pk,
             shared_secret,
