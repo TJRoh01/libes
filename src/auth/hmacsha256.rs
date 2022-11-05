@@ -1,4 +1,5 @@
 use super::generics::Mac;
+use crate::EciesError;
 use hmac::{Hmac, Mac as _};
 use sha2::Sha256;
 
@@ -11,20 +12,22 @@ impl Mac for HmacSha256 {
     const MAC_KEY_LEN: usize = 32;
     const MAC_LEN: usize = 32;
 
-    fn digest(key: &[u8], nonce: &[u8], ciphertext: &[u8]) -> Vec<u8> {
-        let mut mac = Hmac::<Sha256>::new_from_slice(key).unwrap();
+    fn digest(key: &[u8], nonce: &[u8], ciphertext: &[u8]) -> Result<Vec<u8>, EciesError> {
+        let mut mac = Hmac::<Sha256>::new_from_slice(key).map_err(|_| EciesError::BadData)?;
+
         mac.update(nonce);
         mac.update(ciphertext);
 
-        mac.finalize().into_bytes().as_slice().to_vec()
+        Ok(mac.finalize().into_bytes().as_slice().to_vec())
     }
 
-    fn verify(key: &[u8], nonce: &[u8], ciphertext: &[u8], tag: &[u8]) -> Result<(), ()> {
-        let mut mac = Hmac::<Sha256>::new_from_slice(key).unwrap();
+    fn verify(key: &[u8], nonce: &[u8], ciphertext: &[u8], tag: &[u8]) -> Result<(), EciesError> {
+        let mut mac = Hmac::<Sha256>::new_from_slice(key).map_err(|_| EciesError::BadData)?;
 
         mac.update(nonce);
         mac.update(ciphertext);
 
-        mac.verify_slice(tag).map_err(|_| ())
+        mac.verify_slice(tag)
+            .map_err(|_| EciesError::VerificationError)
     }
 }

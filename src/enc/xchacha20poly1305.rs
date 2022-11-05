@@ -1,4 +1,5 @@
 use super::generics::Encryption;
+use crate::EciesError;
 use chacha20poly1305::aead::{Aead, Payload};
 use chacha20poly1305::KeyInit;
 
@@ -32,8 +33,9 @@ impl Encryption for XChaCha20Poly1305 {
     const ENC_KEY_LEN: usize = 32;
     const ENC_NONCE_LEN: usize = 24;
 
-    fn encrypt(key: &[u8], nonce: &[u8], plaintext: &[u8]) -> Vec<u8> {
-        let enc = chacha20poly1305::XChaCha20Poly1305::new_from_slice(key).unwrap();
+    fn encrypt(key: &[u8], nonce: &[u8], plaintext: &[u8]) -> Result<Vec<u8>, EciesError> {
+        let enc = chacha20poly1305::XChaCha20Poly1305::new_from_slice(key)
+            .map_err(|_| EciesError::BadData)?;
         enc.encrypt(
             nonce.into(),
             Payload {
@@ -41,11 +43,12 @@ impl Encryption for XChaCha20Poly1305 {
                 aad: b"",
             },
         )
-        .unwrap()
+        .map_err(|_| EciesError::EncryptionError)
     }
 
-    fn decrypt(key: &[u8], nonce: &[u8], ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
-        let dec = chacha20poly1305::XChaCha20Poly1305::new_from_slice(key).unwrap();
+    fn decrypt(key: &[u8], nonce: &[u8], ciphertext: &[u8]) -> Result<Vec<u8>, EciesError> {
+        let dec = chacha20poly1305::XChaCha20Poly1305::new_from_slice(key)
+            .map_err(|_| EciesError::BadData)?;
         dec.decrypt(
             nonce.into(),
             Payload {
@@ -53,6 +56,6 @@ impl Encryption for XChaCha20Poly1305 {
                 aad: b"",
             },
         )
-        .map_err(|_| ())
+        .map_err(|_| EciesError::DecryptionError)
     }
 }

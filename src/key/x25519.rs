@@ -1,5 +1,6 @@
 use super::conversion::{PublicKeyFrom, SecretKeyFrom, TryPublicKeyFrom, TrySecretKeyFrom};
 use super::generics::{GenerateEphemeralKey, Key, KeyExchange};
+use crate::KeyError;
 use rand_core::OsRng;
 
 #[cfg(feature = "ECIES-MAC")]
@@ -41,15 +42,15 @@ impl PublicKeyFrom<[u8; 32]> for X25519 {
 }
 
 impl TryPublicKeyFrom<&[u8]> for X25519 {
-    fn try_pk_from(x: &[u8]) -> Result<Self, ()> {
-        let bytes: [u8; 32] = x.try_into().map_err(|_| ())?;
+    fn try_pk_from(x: &[u8]) -> Result<Self, KeyError> {
+        let bytes: [u8; 32] = x.try_into().map_err(|_| KeyError::BadData)?;
         Ok(Self::pk_from(bytes))
     }
 }
 
 impl TryPublicKeyFrom<Vec<u8>> for X25519 {
-    fn try_pk_from(x: Vec<u8>) -> Result<Self, ()> {
-        let bytes: [u8; 32] = x.try_into().map_err(|_| ())?;
+    fn try_pk_from(x: Vec<u8>) -> Result<Self, KeyError> {
+        let bytes: [u8; 32] = x.try_into().map_err(|_| KeyError::BadData)?;
         Ok(Self::pk_from(bytes))
     }
 }
@@ -67,15 +68,15 @@ impl SecretKeyFrom<[u8; 32]> for X25519 {
 }
 
 impl TrySecretKeyFrom<&[u8]> for X25519 {
-    fn try_sk_from(x: &[u8]) -> Result<Self::SecretKey, ()> {
-        let bytes: [u8; 32] = x.try_into().map_err(|_| ())?;
+    fn try_sk_from(x: &[u8]) -> Result<Self::SecretKey, KeyError> {
+        let bytes: [u8; 32] = x.try_into().map_err(|_| KeyError::BadData)?;
         Ok(Self::sk_from(bytes))
     }
 }
 
 impl TrySecretKeyFrom<Vec<u8>> for X25519 {
-    fn try_sk_from(x: Vec<u8>) -> Result<Self::SecretKey, ()> {
-        let bytes: [u8; 32] = x.try_into().map_err(|_| ())?;
+    fn try_sk_from(x: Vec<u8>) -> Result<Self::SecretKey, KeyError> {
+        let bytes: [u8; 32] = x.try_into().map_err(|_| KeyError::BadData)?;
         Ok(Self::sk_from(bytes))
     }
 }
