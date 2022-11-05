@@ -3,6 +3,7 @@ use crate::EciesError;
 use hkdf::Hkdf;
 use sha2::Sha256;
 
+// Elliptic curve key implementation
 pub trait Key {
     const EC_KEY_LEN: usize;
     type SecretKey;
@@ -10,13 +11,20 @@ pub trait Key {
     fn as_bytes(&self) -> &[u8];
 }
 
+// ECDH key exchange implementation
+pub trait KeyExchange: Key {
+    fn key_exchange(&self, sk: Self::SecretKey) -> Vec<u8>;
+}
+
+// Provide ephemeral key pair from a CSPRNG
 pub trait GenerateEphemeralKey: Key + Sized {
     fn get_ephemeral_key() -> (Self, Self::SecretKey);
 }
 
-impl<K: TryPublicKeyFrom<Vec<u8>> + Key> SplitEphemeralKey for K {}
+impl<K: TryPublicKeyFrom<Vec<u8>> + Key> TakeEphemeralKey for K {}
 
-pub trait SplitEphemeralKey: TryPublicKeyFrom<Vec<u8>> + Key + Sized {
+// Provide public ephemeral key by taking it from the front of some data
+pub trait TakeEphemeralKey: TryPublicKeyFrom<Vec<u8>> + Key + Sized {
     fn get_ephemeral_key(x: &mut Vec<u8>) -> Result<Self, EciesError> {
         if x.len() < Self::EC_KEY_LEN {
             return Err(EciesError::BadData);
@@ -27,12 +35,9 @@ pub trait SplitEphemeralKey: TryPublicKeyFrom<Vec<u8>> + Key + Sized {
     }
 }
 
-pub trait KeyExchange: Key {
-    fn key_exchange(&self, sk: Self::SecretKey) -> Vec<u8>;
-}
-
 impl<K: Key> DeriveKeyMaterial for K {}
 
+// Provide key material by applying HKDF to some initial key material
 pub trait DeriveKeyMaterial: Key {
     fn derive_key_material(&self, mut shared_secret: Vec<u8>, len: usize) -> Vec<u8> {
         // Tie the shared secret to self, usually ephemeral_pk,

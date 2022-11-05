@@ -30,12 +30,13 @@ impl EciesSynDecryptionSupport for XChaCha20Poly1305 {}
 pub struct XChaCha20Poly1305;
 
 impl Encryption for XChaCha20Poly1305 {
-    const ENC_KEY_LEN: usize = 32;
-    const ENC_NONCE_LEN: usize = 24;
+    const ENCRYPTION_KEY_LEN: usize = 32;
+    const ENCRYPTION_NONCE_LEN: usize = 24;
 
     fn encrypt(key: &[u8], nonce: &[u8], plaintext: &[u8]) -> Result<Vec<u8>, EciesError> {
         let enc = chacha20poly1305::XChaCha20Poly1305::new_from_slice(key)
             .map_err(|_| EciesError::BadData)?;
+
         enc.encrypt(
             nonce.into(),
             Payload {
@@ -49,6 +50,7 @@ impl Encryption for XChaCha20Poly1305 {
     fn decrypt(key: &[u8], nonce: &[u8], ciphertext: &[u8]) -> Result<Vec<u8>, EciesError> {
         let dec = chacha20poly1305::XChaCha20Poly1305::new_from_slice(key)
             .map_err(|_| EciesError::BadData)?;
+
         dec.decrypt(
             nonce.into(),
             Payload {
