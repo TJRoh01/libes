@@ -34,7 +34,7 @@ impl Encryption for XChaCha20Poly1305 {
     const ENC_NONCE_LEN: usize = 24;
 
     fn encrypt(key: &[u8], nonce: &[u8], plaintext: &[u8]) -> Result<Vec<u8>, Error> {
-        let enc = chacha20poly1305::XChaCha20Poly1305::new_from_slice(key).map_err(|_| Error)?;
+        let enc = chacha20poly1305::XChaCha20Poly1305::new_from_slice(key).map_err(|_| Error::BadData)?;
         enc.encrypt(
             nonce.into(),
             Payload {
@@ -42,11 +42,11 @@ impl Encryption for XChaCha20Poly1305 {
                 aad: b"",
             },
         )
-        .map_err(|_| Error)
+        .map_err(|_| Error::EncryptionError)
     }
 
     fn decrypt(key: &[u8], nonce: &[u8], ciphertext: &[u8]) -> Result<Vec<u8>, Error> {
-        let dec = chacha20poly1305::XChaCha20Poly1305::new_from_slice(key).map_err(|_| Error)?;
+        let dec = chacha20poly1305::XChaCha20Poly1305::new_from_slice(key).map_err(|_| Error::BadData)?;
         dec.decrypt(
             nonce.into(),
             Payload {
@@ -54,6 +54,6 @@ impl Encryption for XChaCha20Poly1305 {
                 aad: b"",
             },
         )
-        .map_err(|_| Error)
+        .map_err(|_| Error::DecryptionError)
     }
 }

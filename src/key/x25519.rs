@@ -43,14 +43,14 @@ impl PublicKeyFrom<[u8; 32]> for X25519 {
 
 impl TryPublicKeyFrom<&[u8]> for X25519 {
     fn try_pk_from(x: &[u8]) -> Result<Self, Error> {
-        let bytes: [u8; 32] = x.try_into().map_err(|_| Error)?;
+        let bytes: [u8; 32] = x.try_into().map_err(|_| Error::BadKey)?;
         Ok(Self::pk_from(bytes))
     }
 }
 
 impl TryPublicKeyFrom<Vec<u8>> for X25519 {
     fn try_pk_from(x: Vec<u8>) -> Result<Self, Error> {
-        let bytes: [u8; 32] = x.try_into().map_err(|_| Error)?;
+        let bytes: [u8; 32] = x.try_into().map_err(|_| Error::BadKey)?;
         Ok(Self::pk_from(bytes))
     }
 }
@@ -69,14 +69,14 @@ impl SecretKeyFrom<[u8; 32]> for X25519 {
 
 impl TrySecretKeyFrom<&[u8]> for X25519 {
     fn try_sk_from(x: &[u8]) -> Result<Self::SecretKey, Error> {
-        let bytes: [u8; 32] = x.try_into().map_err(|_| Error)?;
+        let bytes: [u8; 32] = x.try_into().map_err(|_| Error::BadKey)?;
         Ok(Self::sk_from(bytes))
     }
 }
 
 impl TrySecretKeyFrom<Vec<u8>> for X25519 {
     fn try_sk_from(x: Vec<u8>) -> Result<Self::SecretKey, Error> {
-        let bytes: [u8; 32] = x.try_into().map_err(|_| Error)?;
+        let bytes: [u8; 32] = x.try_into().map_err(|_| Error::BadKey)?;
         Ok(Self::sk_from(bytes))
     }
 }

@@ -13,7 +13,7 @@ impl<M: Mac> SplitMacKey for M {}
 pub trait SplitMacKey: Mac {
     fn get_mac_key(x: &mut Vec<u8>) -> Result<Vec<u8>, Error> {
         if x.len() < Self::MAC_KEY_LEN {
-            return Err(Error)
+            return Err(Error::BadData)
         }
 
         Ok(x.drain(..Self::MAC_KEY_LEN).collect())
@@ -25,7 +25,7 @@ impl<M: Mac> SplitMac for M {}
 pub trait SplitMac: Mac {
     fn get_mac(x: &mut Vec<u8>) -> Result<Vec<u8>, Error> {
         if x.len() < Self::MAC_LEN {
-            return Err(Error)
+            return Err(Error::BadData)
         }
 
         Ok(x.drain(..Self::MAC_LEN).collect())

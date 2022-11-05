@@ -245,9 +245,22 @@ use key::conversion::{IntoPublicKey, TryIntoPublicKey};
 use key::generics::Key;
 use std::marker::PhantomData;
 
-/// Generic error type
 #[derive(Debug)]
-pub struct Error;
+pub enum Error {
+    /// Failed to parse some data
+    ///
+    /// For encryption: internal error
+    /// For decryption: bad `ciphertext` or internal error
+    BadData,
+    /// Failed to convert raw key into key for specified algorithm
+    BadKey,
+    /// Failed to verify attached `Authentication Tag`
+    BadAuthenticationTag,
+    /// Failed to encrypt data
+    EncryptionError,
+    /// Failed to decrypt data
+    DecryptionError
+}
 
 /// Generic `ECIES` instance
 pub struct Ecies<K, E, A> {
