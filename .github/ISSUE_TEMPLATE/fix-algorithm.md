@@ -1,8 +1,8 @@
 ---
 name: Fix algorithm
 about: Suggest changing an algorithm implementation and/or dependency
-title: "[ADD] ALGORITHM NAME"
-labels: add algorithm
+title: "[FIX] ALGORITHM NAME"
+labels: fix algorithm
 assignees: ''
 
 ---
