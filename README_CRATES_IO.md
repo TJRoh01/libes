@@ -11,15 +11,24 @@ The goal of this is library is to become a one-stop shop for everything ECIES.
 
 For code documentation, usage explanations, and examples please see [Docs.rs](https://docs.rs/libes/latest/libes/).
 
-## ⚠️ Alpha Release Track - Not Production Ready ⚠️
-During alpha development, versions 0.1.Z, there is no guarantee of backwards compatibility and
-the API can change at any time. If you decide to use this library at this time, make sure that
-you always use the latest version, and be prepared to update your usage of the library often.
+## ⚠️ Beta Release Track - Not Production Ready ⚠️
+During beta development, versions 0.2+.Z, backwards compatibility for decryption is guaranteed.
+
+This means that data encrypted using library version X.Y.Z can be decrypted using any superseding library version as
+long as X is the same, even if the algorithm used for encryption was yanked it will still be available for decryption
+until X is incremented.
+
+The public API structure will not change, but algorithms that are potentially found to be broken for any reason will be
+immediately removed and the library will be released with an incremented Y in X.Y.Z, and versions implementing that
+algorithm will be yanked.
+
+The private API is still under development, so make sure that you always use the latest version 0.Y.Z to receive
+all patches that are released. An incremented Z in X.Y.Z will not require any modifications in your code, of course
+with the exception for an algorithm being yanked.
 
 ## Why use libes?
-The rust cryptography ecosystem is swarming with crates, with varying degrees
-of quality and documentation. I have taken it onto myself to navigate this,
-and I want to share my findings with those who are trying to make sense of it like me.
+The rust cryptography ecosystem is swarming with crates, with varying degrees of quality and documentation. I have taken
+it onto myself to navigate this, and I want to share my findings with those who are trying to make sense of it like me.
 
 In doing this I commit myself to:
 - Maintaining a curated selection of relevant crates
@@ -62,11 +71,9 @@ TBD
 
 # About
 ## What is ECIES?
-ECIES stands for **E**lliptic **C**urve **I**ntegrated **E**ncryption **S**cheme.
-It is a type of cryptographic procedure which allows encrypting data
-for a specific recipient given only the data to be encrypted and
-the recipients public key, everything else is derived from the input
-or generated with a
+ECIES stands for **E**lliptic **C**urve **I**ntegrated **E**ncryption **S**cheme. It is a type of cryptographic
+procedure which allows encrypting data for a specific recipient given only the data to be encrypted and the recipients
+public key, everything else is derived from the input or generated using a
 CSPRNG (**C**ryptographically **S**ecure **P**seudo-**R**andom **N**umber **G**enerator).
 
 [Wikipedia](https://en.wikipedia.org/wiki/Integrated_Encryption_Scheme)  
@@ -74,77 +81,67 @@ CSPRNG (**C**ryptographically **S**ecure **P**seudo-**R**andom **N**umber **G**e
 [Practical Cryptography for Developers](https://cryptobook.nakov.com/asymmetric-key-ciphers/ecies-public-key-encryption)
 
 ## ECIES Variants
-Cryptographic algorithms have evolved over time, and thus have grown into
-two distinct ECIES variants as of writing.
+Cryptographic algorithms have evolved over time, and thus have grown into two distinct ECIES variants as of writing.
 
-Originally, ECIES relied on a key exchange operation, an encryption operation,
-and a separate MAC operation.
+Originally, ECIES relied on a key exchange operation, an encryption operation, and a separate MAC operation.
 
-A MAC (**M**essage **A**uthentication **C**ode) is necessary to provide
-**Authenticity** on top of **Confidentiality**. By exploiting vulnerabilities
-and/or compromised parameters, encrypted data could potentially be manipulated
-to produce a desired output, other than what the sender intended. A MAC can be
-used separately from the encrypted data to verify that such manipulation did
-not take place.
+A MAC (**M**essage **A**uthentication **C**ode) is necessary to provide **Authenticity** on top of **Confidentiality**.
+By exploiting vulnerabilities and/or compromised parameters, encrypted data could potentially be manipulated to produce
+a desired output, other than what the sender intended. A MAC can be used separately from the encrypted data to verify
+that such manipulation did not take place.
 
-More recently adopted encryption algorithms like AES-GCM and ChaCha20-Poly1305
-are AEAD (**A**uthenticated **E**ncryption with **A**dditional **D**ata) algorithms
-which in addition to a ciphertext, also produce an Authentication Tag which serves
-the same purpose that a MAC does in this case, but is integrated in the encryption
-algorithm itself.
+More recently adopted encryption algorithms like AES-GCM and ChaCha20-Poly1305 are
+AEAD (**A**uthenticated **E**ncryption with **A**dditional **D**ata) algorithms which in addition to a ciphertext,
+also produce an Authentication Tag which serves the same purpose that a MAC does in this case, but is integrated in the
+encryption algorithm itself.
 
 The library and documentation will refer to these two variants as:
 - **ECIES-MAC** (Encryption with MAC)
 - **ECIES-AEAD** (AEAD Encryption instead of MAC)
 
-Iterating further on ECIES-AEAD, it could be further integrated by **synthesizing**
-the IV/Nonce rather than **generating** it randomly. This would eliminate the need
-to store & transmit the Nonce, as well as reduce the overhead by one or
-two dozen bytes. Because there is already random data in the ephemeral key,
-the risk of deriving the same encryption key twice is minimal, and thus it
-should be safe to do so. This third variant will be referred to as **ECIES-SYN**.
+Iterating further on ECIES-AEAD, it could be further integrated by **synthesizing** the IV/Nonce rather than
+**generating** it randomly. This would eliminate the need to store & transmit the IV/Nonce, as well as reduce the
+overhead by one or two dozen bytes. Because there is already random data in the ephemeral key, the risk of deriving the
+same IV/Nonce twice is about equivalent with generating it randomly, and thus it should be safe to do so.
+This third variant will be referred to as **ECIES-SYN**.
 
-**DISCLAIMER:** ECIES-SYN is my own idea, which I will only implement for
-algorithms that I have done extensive research on to ensure that it is
-cryptographically secure to do so. Regardless, I am not a cryptography
-researcher and I can not give a guarantee that issues will not arise
-in the future. If ECIES-SYN turns out to be useful/popular and resources allow,
-I will make sure that it receives a security audit.
+**DISCLAIMER:** ECIES-SYN has not received a security audit! ECIES-SYN is my own idea, which I will only implement for
+algorithms that I have done extensive research on to ensure that it is cryptographically secure to do so.
+Regardless, I am not a cryptography researcher and I can not give a guarantee that issues will not arise in the future.
+If ECIES-SYN turns out to be useful/popular and resources allow, I will make sure that it receives a security audit.
 
 ## ECIES-MAC Flowchart
-See the README.md on [GitHub](https://github.com/TJRoh01/libes/blob/main/README.md).
+See the README.md on [GitHub](https://github.com/TJRoh01/libes/blob/main/README.md#ecies-mac-flowchart).
 
 ## ECIES-AEAD Flowchart
-See the README.md on [GitHub](https://github.com/TJRoh01/libes/blob/main/README.md).
+See the README.md on [GitHub](https://github.com/TJRoh01/libes/blob/main/README.md#ecies-aead-flowchart).
 
 ## ECIES-SYN Flowchart
-See the README.md on [GitHub](https://github.com/TJRoh01/libes/blob/main/README.md).
+See the README.md on [GitHub](https://github.com/TJRoh01/libes/blob/main/README.md#ecies-syn-flowchart).
 
 ## SemVer
 This library respects SemVer, and guarantees decryption backwards compatibility.
 
-This means that data encrypted using library version X.Y.Z can be decrypted
-using any superseding library version as long as X is the same.
+This means that data encrypted using library version X.Y.Z can be decrypted using any superseding library version as
+long as X is the same.
 
-For example, data encrypted using version 0.5.7 can be decrypted using version
-0.5.7 or 0.11.1, but not using versions 1.2.3, 0.5.6, or 0.4.10.
+For example, data encrypted using version 0.5.7 can be decrypted using version 0.5.7 or 0.11.1, but not using versions
+1.2.3, 0.5.6, or 0.4.10.
 
-Effort will be made to keep X, the major version, decryption backwards compatible
-as well, but no guarantee is given.
+Effort will be made to keep X, the major version, decryption backwards compatible as well, but no guarantee is given.
 
 ## Release Tracks
 - v0.1.Z: alpha - initial strcuture
-- v0.(2+).Z: beta - adding algorithms
-- v1.0.0-pre.W: pre-production - refactoring & memory zeroing implementation
+- v0.(2+).Z: beta - adding algorithms, memory zeroing, and other features
+- v1.0.0-pre.W: pre-production - refactoring
 - v1.0.0: initial production - potentially backwards-incompatible refactoring
 - V1.(1+).Z: production - wasm support & more
 
 ## Conditional Compilation
-All algorithm combinations are gated behind features, to reduce how much is
-being compiled. Features are named exactly like the algorithm names in the
-support matrices (if there are alternative names like P-521 and secp521r1 then
-they are aliases, so you can enable either). This library uses traits to implement
-appropriate functionality on valid user-defined variants.
+All algorithm combinations are gated behind features, to reduce how much is being compiled. Features are named exactly
+like the algorithm names in the support matrices (if there are alternative names like P-521 and secp521r1 then they are
+aliases, so you can enable either). This library uses traits to implement appropriate functionality on valid
+user-defined variants.
 
 **NOTE:** No ECIES variants are available without activating any features,
 at minimum one of each feature categories must be activated:
@@ -155,7 +152,7 @@ at minimum one of each feature categories must be activated:
 **NOTE:** For a ECIES combination to be valid the Elliptic Curve, Encryption,
 and Authentication algorithms must all support the same ECIES variant.
 - To use ECIES-MAC, all three chosen algorithms need a "🚀" in their respective ECIES-MAC columns
-- To use ECIES-AEAD or ECIES-SYN both first two algorithms need a "🚀" in the variant column
+- To use ECIES-AEAD or ECIES-SYN both first two algorithms need a "🚀" in the ECIES-variant column
 
 # Algorithm support
 Matrix entries are of form `Encryption & Decryption` or `Encryption`/`Decryption`
@@ -171,7 +168,7 @@ Matrix entries are of form `Encryption & Decryption` or `Encryption`/`Decryption
 | Algorithm/ECIES Variant | ECIES-MAC | ECIES-AEAD | ECIES-SYN |
 |:-----------------------:|:---------:|:----------:|:---------:|
 |         x25519          |    🚀     |     🚀     |    🚀     |
-|         ed25519         |   🏗️️    |    🏗️    |    🏗️    |
+|         ed25519         |   🏗️️    |    🏗️     |    🏗️    |
 |    K-256 / secp256k1    |    📅     |     📅     |    📅     |
 |    P-256 / secp256r1    |    📅     |     📅     |    📅     |
 |    P-384 / secp384r1    |    🤔     |     🤔     |    🤔     |
@@ -190,13 +187,10 @@ Matrix entries are of form `Encryption & Decryption` or `Encryption`/`Decryption
 |       HMAC-SHA256       |    🚀     |
 |       HMAC-SHA512       |    🤔     |
 
-[^1]: ChaCha20 uses a 96-bit nonce,
-which when generated using a random function has an unsatisfactory
-risk of collision. XChaCha20 uses a 192-bit nonce
-where that is no longer an issue.
+[^1]: ChaCha20 uses a 96-bit nonce, which when generated using a random function has an unsatisfactory risk of collision.
+XChaCha20 uses a 192-bit nonce where that is no longer an issue.
 
-[^2]: Will not encourage using potentially weak encryption [^1]
-by implementing decryption for it
+[^2]: Will not encourage using potentially weak encryption [^1] by implementing decryption for it.
 
 # License
 Licensed under either of:
@@ -208,13 +202,13 @@ at your option.
 # Contributing
 All contributions are very appreciated.
 
-- If you spot a mistake or a vulnerability in this crate or any of its dependencies please open an issue with the **Fix algorithm** template
+- If you spot a mistake or a vulnerability in this crate or any of its dependencies please open an issue with the
+  **Fix algorithm** template
 - If you want to suggest adding support for a new algorithm, please use the **Add algorithm** template
 - If you believe support for an algorithm should be deprecate, please use the **Deprecate algorithm** template
 
 For all other issues, please try to include enough information so that it is possible to determine what to do or plan
 without having to ask too many follow-up questions.
 
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in this project by you, as defined in the Apache-2.0 license,
-shall be dual licensed as above, without any additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this project by you,
+as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.

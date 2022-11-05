@@ -12,10 +12,20 @@
 //! For project details like ECIES variant flowcharts, explanations, license, and release tracks
 //! please see the README.md on [GitHub](https://github.com/TJRoh01/libes/blob/main/README.md).
 //!
-//! ## ⚠️ Alpha Release Track - Not Production Ready ⚠️
-//! During alpha development, versions 0.1.Z, there is no guarantee of backwards compatibility and
-//! the API can change at any time. If you decide to use this library at this time, make sure that
-//! you always use the latest version, and be prepared to update your usage of the library often.
+//! ## ⚠️ Beta Release Track - Not Production Ready ⚠️
+//! During beta development, versions 0.2+.Z, backwards compatibility for decryption is guaranteed.
+//!
+//! This means that data encrypted using library version X.Y.Z can be decrypted using any
+//! superseding library version as long as X is the same, even if the algorithm used for encryption
+//! was yanked it will still be available for decryption until X is incremented.
+//!
+//! The public API structure will not change, but algorithms that are potentially found to be broken
+//! for any reason will be immediately removed and the library will be released with an incremented
+//! Y in X.Y.Z, and versions implementing that algorithm will be yanked.
+//!
+//! The private API is still under development, so make sure that you always use the latest version
+//! 0.Y.Z to receive all patches that are released. An incremented Z in X.Y.Z will not require any
+//! modifications in your code, of course with the exception for an algorithm being yanked.
 //!
 //! ## The mechanics of libes
 //! Internally, libes is built up using generics. This allows the library to add support for
