@@ -61,8 +61,24 @@
 //! ## Code example
 //! ### Receiver
 //! ```rust
-//! # use libes::{Error, auth, Ecies, enc, key};
-//! # fn main() -> Result<(), Error> {
+//! # use libes::{KeyError, EciesError, auth, Ecies, enc, key};
+//! #
+//! # #[derive(Debug)]
+//! # struct DocError;
+//! #
+//! # impl From<EciesError> for DocError {
+//! #     fn from(_: EciesError) -> Self {
+//! #         Self
+//! #     }
+//! # }
+//! #
+//! # impl From<KeyError> for DocError {
+//! #     fn from(_: KeyError) -> Self {
+//! #         Self
+//! #     }
+//! # }
+//! #
+//! # fn main() -> Result<(), DocError> {
 //! // Create an alias for Ecies with our chosen algorithms
 //! type MyEcies = Ecies<key::X25519, enc::XChaCha20Poly1305, auth::Aead>;
 //!
@@ -97,8 +113,24 @@
 //!
 //! ### Sender
 //! ```rust
-//! # use libes::{Error, auth, Ecies, enc, key};
-//! # fn main() -> Result<(), Error> {
+//! # use libes::{KeyError, EciesError, auth, Ecies, enc, key};
+//! #
+//! # #[derive(Debug)]
+//! # struct DocError;
+//! #
+//! # impl From<EciesError> for DocError {
+//! #     fn from(_: EciesError) -> Self {
+//! #         Self
+//! #     }
+//! # }
+//! #
+//! # impl From<KeyError> for DocError {
+//! #     fn from(_: KeyError) -> Self {
+//! #         Self
+//! #     }
+//! # }
+//! #
+//! # fn main() -> Result<(), DocError> {
 //! // Create an alias for Ecies with our chosen algorithms
 //! type MyEcies = Ecies<key::X25519, enc::XChaCha20Poly1305, auth::Aead>;
 //!
@@ -133,8 +165,24 @@
 //!
 //! ### Receiver
 //! ```rust
-//! # use libes::{Error, auth, Ecies, enc, key};
-//! # fn main() -> Result<(), Error> {
+//! # use libes::{KeyError, EciesError, auth, Ecies, enc, key};
+//! #
+//! # #[derive(Debug)]
+//! # struct DocError;
+//! #
+//! # impl From<EciesError> for DocError {
+//! #     fn from(_: EciesError) -> Self {
+//! #         Self
+//! #     }
+//! # }
+//! #
+//! # impl From<KeyError> for DocError {
+//! #     fn from(_: KeyError) -> Self {
+//! #         Self
+//! #     }
+//! # }
+//! #
+//! # fn main() -> Result<(), DocError> {
 //! // Create an alias for Ecies with our chosen algorithms
 //! type MyEcies = Ecies<key::X25519, enc::XChaCha20Poly1305, auth::Aead>;
 //!
@@ -246,20 +294,26 @@ use key::generics::Key;
 use std::marker::PhantomData;
 
 #[derive(Debug)]
-pub enum Error {
+pub enum EciesError {
     /// Failed to parse some data
     ///
-    /// For encryption: internal error
-    /// For decryption: bad `ciphertext` or internal error
+    /// - for encryption: `internal error`
+    /// - for decryption: `bad ciphertext` or `internal error`
     BadData,
-    /// Failed to convert raw key into key for specified algorithm
-    BadKey,
-    /// Failed to verify attached `Authentication Tag`
-    BadAuthenticationTag,
+    /// Failed to verify attached Authentication Tag
+    ///
+    /// Only on ECIES-MAC
+    VerificationError,
     /// Failed to encrypt data
     EncryptionError,
     /// Failed to decrypt data
-    DecryptionError
+    DecryptionError,
+}
+
+#[derive(Debug)]
+pub enum KeyError {
+    /// Failed to convert raw key data into key for specified algorithm
+    BadData,
 }
 
 /// Generic `ECIES` instance
@@ -281,7 +335,7 @@ impl<K: Key, E, A> Ecies<K, E, A> {
         }
     }
 
-    pub fn try_new<T: TryIntoPublicKey<K>>(recipient_public_key: T) -> Result<Self, Error> {
+    pub fn try_new<T: TryIntoPublicKey<K>>(recipient_public_key: T) -> Result<Self, KeyError> {
         Ok(Self::new(recipient_public_key.try_into_pk()?))
     }
 }
@@ -294,7 +348,7 @@ where
     A: Mac + SplitMacKey,
 {
     /// Encrypt `plaintext` using the `ECIES-MAC` variant
-    pub fn encrypt(&self, plaintext: &[u8]) -> Result<Vec<u8>, Error> {
+    pub fn encrypt(&self, plaintext: &[u8]) -> Result<Vec<u8>, EciesError> {
         // Generate
         let (ephemeral_pk, ephemeral_sk) = K::get_ephemeral_key();
         let nonce = E::get_nonce();
@@ -336,7 +390,7 @@ where
     pub fn decrypt<T: IntoSecretKey<K>>(
         recipient_secret_key: T,
         ciphertext: &[u8],
-    ) -> Result<Vec<u8>, Error> {
+    ) -> Result<Vec<u8>, EciesError> {
         let mut ciphertext = ciphertext.to_vec();
 
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext)?;
@@ -364,7 +418,7 @@ where
     E: EciesAeadEncryptionSupport + Encryption + GenNonce + SplitEncKey,
 {
     /// Encrypt `plaintext` using the `ECIES-AEAD` variant
-    pub fn encrypt(&self, plaintext: &[u8]) -> Result<Vec<u8>, Error> {
+    pub fn encrypt(&self, plaintext: &[u8]) -> Result<Vec<u8>, EciesError> {
         // Generate
         let (ephemeral_pk, ephemeral_sk) = K::get_ephemeral_key();
         let nonce = E::get_nonce();
@@ -398,7 +452,7 @@ where
     pub fn decrypt<T: IntoSecretKey<K>>(
         recipient_secret_key: T,
         ciphertext: &[u8],
-    ) -> Result<Vec<u8>, Error> {
+    ) -> Result<Vec<u8>, EciesError> {
         let mut ciphertext = ciphertext.to_vec();
 
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext)?;
@@ -419,7 +473,7 @@ where
     E: EciesSynEncryptionSupport + Encryption + SplitNonce + SplitEncKey,
 {
     /// Encrypt `plaintext` using the `ECIES-SYN` variant
-    pub fn encrypt(&self, plaintext: &[u8]) -> Result<Vec<u8>, Error> {
+    pub fn encrypt(&self, plaintext: &[u8]) -> Result<Vec<u8>, EciesError> {
         // Generate
         let (ephemeral_pk, ephemeral_sk) = K::get_ephemeral_key();
 
@@ -456,7 +510,7 @@ where
     pub fn decrypt<T: IntoSecretKey<K>>(
         recipient_secret_key: T,
         ciphertext: &[u8],
-    ) -> Result<Vec<u8>, Error> {
+    ) -> Result<Vec<u8>, EciesError> {
         let mut ciphertext = ciphertext.to_vec();
 
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext)?;
