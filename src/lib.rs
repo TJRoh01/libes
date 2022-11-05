@@ -64,7 +64,7 @@
 //! 5. We enable the corresponding features for the libes dependency to compile our chosen functionality
 //!     - ```toml
 //!       [dependencies.libes]
-//!       version = "*" # For the Alpha Release Track, always use the latest version
+//!       version = "0" # For the Beta Release Track, always use the latest major version 0
 //!       features = ["ECIES-AEAD", "x25519", "XChaCha20-Poly1305"]
 //!       ```
 //!
