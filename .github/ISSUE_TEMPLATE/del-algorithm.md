@@ -1,6 +1,6 @@
 ---
 name: Deprecate algorithm
-about: Suggest deprecating an algorithm implementation
+about: Suggest deprecating support for an algorithm
 title: "[DEL] ALGORITHM NAME"
 labels: del algorithm
 assignees: ''

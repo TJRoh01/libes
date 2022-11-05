@@ -398,10 +398,14 @@ Licensed under either of:
 at your option.
 
 # Contributing
-All contributions are very appreciated. If you spot a mistake or a vulnerability in
-this crate or any of its dependencies please open an issue. Currently, there is no
-template for issues or pull requests, but please try to include enough information
-to be able to determine what to do without having to ask too many follow-up questions.
+All contributions are very appreciated.
+
+- If you spot a mistake or a vulnerability in this crate or any of its dependencies please open an issue with the **Fix algorithm** template
+- If you want to suggest adding support for a new algorithm, please use the **Add algorithm** template
+- If you believe support for an algorithm should be deprecate, please use the **Deprecate algorithm** template
+
+For all other issues, please try to include enough information so that it is possible to determine what to do or plan
+without having to ask too many follow-up questions.
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in this project by you, as defined in the Apache-2.0 license,
