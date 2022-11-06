@@ -168,7 +168,7 @@ Matrix entries are of form `Encryption & Decryption` or `Encryption`/`Decryption
 | Algorithm/ECIES Variant | ECIES-MAC | ECIES-AEAD | ECIES-SYN |
 |:-----------------------:|:---------:|:----------:|:---------:|
 |         x25519          |    🚀     |     🚀     |    🚀     |
-|         ed25519         |   🏗️️    |    🏗️     |    🏗️    |
+|         ed25519         |    🚀     |    🚀️     |    🚀️    |
 |    K-256 / secp256k1    |    📅     |     📅     |    📅     |
 |    P-256 / secp256r1    |    📅     |     📅     |    📅     |
 |    P-384 / secp384r1    |    🤔     |     🤔     |    🤔     |

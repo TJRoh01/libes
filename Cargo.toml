@@ -1,6 +1,6 @@
 [package]
     name = "libes"
-    version = "0.2.0"
+    version = "0.3.0"
     authors = ["Tomas Rohatynski"]
     edition = "2021"
     rust-version = "1.60"
@@ -31,7 +31,7 @@
     ECIES-SYN = []
 # Elliptic Curve
     x25519 = ["dep:x25519-dalek"]
-    ed25519 = ["dep:ed25519-dalek"]
+    ed25519 = ["dep:ed25519-dalek", "dep:x25519-dalek", "dep:curve25519-dalek"]
     K-256 = ["secp256k1"]
     secp256k1 = []
     P-256 = ["secp256r1"]
@@ -49,4 +49,8 @@
     hmac = { version = "0.12.1", optional = true }
     x25519-dalek = { version = "2.0.0-pre.1", optional = true }
     ed25519-dalek = { version = "1.0.1", optional = true }
+    curve25519-dalek = { version = "3.2.0", optional = true }
     chacha20poly1305 = { version = "0.10.1", optional = true }
+
+[dev-dependencies]
+    rand = "0.7"
