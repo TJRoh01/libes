@@ -90,7 +90,7 @@ By exploiting vulnerabilities and/or compromised parameters, encrypted data coul
 a desired output, other than what the sender intended. A MAC can be used separately from the encrypted data to verify
 that such manipulation did not take place.
 
-More recently adopted encryption algorithms like AES-GCM and ChaCha20-Poly1305 are
+More recently adopted encryption algorithms like AES256-GCM and ChaCha20-Poly1305 are
 AEAD (**A**uthenticated **E**ncryption with **A**dditional **D**ata) algorithms which in addition to a ciphertext,
 also produce an Authentication Tag which serves the same purpose that a MAC does in this case, but is integrated in the
 encryption algorithm itself.
@@ -146,7 +146,7 @@ user-defined variants.
 **NOTE:** No ECIES variants are available without activating any features,
 at minimum one of each feature categories must be activated:
 - Elliptic Curve (e.g. x25519)
-- Encryption (e.g. AES-GCM)
+- Encryption (e.g. AES256-GCM)
 - Authentication (e.g. ECIES-AEAD or HMAC-SHA256)
 
 **NOTE:** For a ECIES combination to be valid the Elliptic Curve, Encryption,
@@ -179,7 +179,7 @@ Matrix entries are of form `Encryption & Decryption` or `Encryption`/`Decryption
 |:-----------------------:|:-------------:|:-------------:|:-------------:|
 |    ChaCha20-Poly1305    | 🚫[^1]/🚫[^2] | 🚫[^1]/🚫[^2] | 🚫[^1]/🚫[^2] |
 |   XChaCha20-Poly1305    |      🚀       |      🚀       |      🚀       |
-|         AES-GCM         |      📅       |      📅       |      📅       |
+|         AES256-GCM         |      📅       |      📅       |      📅       |
 
 ## Authentication Support Matrix
 | Algorithm/ECIES Variant | ECIES-MAC |
