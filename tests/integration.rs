@@ -238,8 +238,7 @@ fn x25519_aes256gcm_aead() {
     let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
 
     // Decrypt
-    let plaintext =
-        X25519Aes256GcmAead::decrypt(sk2, &ciphertext).expect("decryption failed");
+    let plaintext = X25519Aes256GcmAead::decrypt(sk2, &ciphertext).expect("decryption failed");
 
     assert_eq!(LOREM_IPSUM.to_vec(), plaintext);
 }
@@ -266,8 +265,7 @@ fn x25519_aes256gcm_syn() {
     let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
 
     // Decrypt
-    let plaintext =
-        X25519Aes256GcmSyn::decrypt(sk2, &ciphertext).expect("decryption failed");
+    let plaintext = X25519Aes256GcmSyn::decrypt(sk2, &ciphertext).expect("decryption failed");
 
     assert_eq!(LOREM_IPSUM.to_vec(), plaintext);
 }
@@ -330,8 +328,7 @@ fn ed25519_aes256gcm_aead() {
     let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
 
     // Decrypt
-    let plaintext =
-        Ed25519Aes256GcmAead::decrypt(sk2, &ciphertext).expect("decryption failed");
+    let plaintext = Ed25519Aes256GcmAead::decrypt(sk2, &ciphertext).expect("decryption failed");
 
     assert_eq!(LOREM_IPSUM.to_vec(), plaintext);
 }
@@ -362,8 +359,7 @@ fn ed25519_aes256gcm_syn() {
     let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
 
     // Decrypt
-    let plaintext =
-        Ed25519Aes256GcmSyn::decrypt(sk2, &ciphertext).expect("decryption failed");
+    let plaintext = Ed25519Aes256GcmSyn::decrypt(sk2, &ciphertext).expect("decryption failed");
 
     assert_eq!(LOREM_IPSUM.to_vec(), plaintext);
 }
