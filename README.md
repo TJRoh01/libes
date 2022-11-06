@@ -367,11 +367,12 @@ Matrix entries are of form `Encryption & Decryption` or `Encryption`/`Decryption
 |    P-521 / secp521r1    |    🤔     |     🤔     |    🤔     |
 
 ## Encryption Support Matrix
-| Algorithm/ECIES Variant |   ECIES-MAC   |  ECIES-AEAD   |   ECIES-SYN   |
-|:-----------------------:|:-------------:|:-------------:|:-------------:|
-|    ChaCha20-Poly1305    | 🚫[^1]/🚫[^2] | 🚫[^1]/🚫[^2] | 🚫[^1]/🚫[^2] |
-|   XChaCha20-Poly1305    |      🚀       |      🚀       |      🚀       |
-|       AES256-GCM        |      🚀       |      🚀       |      🚀       |
+| Algorithm/ECIES Variant | ECIES-MAC | ECIES-AEAD | ECIES-SYN |
+|:-----------------------:|:---------:|:----------:|:---------:|
+|    ChaCha20-Poly1305    |    📅     |     📅     |    📅     |
+|   XChaCha20-Poly1305    |    🚀     |     🚀     |    🚀     |
+|       AES128-GCM        |  🚫[^1]   |   🚫[^1]   |  🚫[^1]   |
+|       AES256-GCM        |    🚀     |     🚀     |    🚀     |
 
 ## Authentication Support Matrix
 | Algorithm/ECIES Variant | ECIES-MAC |
@@ -379,10 +380,11 @@ Matrix entries are of form `Encryption & Decryption` or `Encryption`/`Decryption
 |       HMAC-SHA256       |    🚀     |
 |       HMAC-SHA512       |    🤔     |
 
-[^1]: ChaCha20 uses a 96-bit nonce, which when generated using a random function has an unsatisfactory risk of collision.
-XChaCha20 uses a 192-bit nonce where that is no longer an issue.
-
-[^2]: Will not encourage using potentially weak encryption [^1] by implementing decryption for it.
+[^1]: AES128-GCM uses a 128-bit key and a 96-bit nonce, and when using a CSPRNG as the de-facto source to generate them,
+the collision risk in a 224-bit space is unsatisfactory. Due to this encryption is not implemented, along with decryption
+in order to not encourage using this variant in other libraries. **Note:** like AES128-GCM, AES256-GCM and some other
+encryption algorithms in this library also use a 96-bit nonce, but unlike AES256-GCM they have larger keys like 256 bits,
+which when combined with a 96-bit nonce makes the collision risk acceptable.
 
 # License
 Licensed under either of:
