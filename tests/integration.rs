@@ -106,20 +106,20 @@ fn ed25519_xchachapoly1305_hmacsha256() {
     let pk = kp.public;
 
     // Emulate transmitting as bytes
-    //let sk_bytes = sk.to_bytes().to_vec();
-    //let pk_bytes = pk.to_bytes().to_vec();
+    let sk_bytes = sk.to_bytes().to_vec();
+    let pk_bytes = pk.to_bytes().to_vec();
 
     // Check converting back into keys
-    //let sk2 = Ed25519::try_sk_from(sk_bytes).expect("sk is not correct");
-    //let pk2 = Ed25519::try_pk_from(pk_bytes).expect("pk is not correct");
+    let sk2 = Ed25519::try_sk_from(sk_bytes).expect("sk is not correct");
+    let pk2 = Ed25519::try_pk_from(pk_bytes).expect("pk is not correct");
 
     // Instantiate Ecies & Encrypt
-    let enc = Ed25519XChaCha20Poly1305HmacSha256::new(pk);
+    let enc = Ed25519XChaCha20Poly1305HmacSha256::new(pk2);
     let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
 
     // Decrypt
     let plaintext =
-        Ed25519XChaCha20Poly1305HmacSha256::decrypt(sk, &ciphertext).expect("decryption failed");
+        Ed25519XChaCha20Poly1305HmacSha256::decrypt(sk2, &ciphertext).expect("decryption failed");
 
     assert_eq!(LOREM_IPSUM.to_vec(), plaintext);
 }
@@ -138,20 +138,20 @@ fn ed25519_xchachapoly1305_aead() {
     let pk = kp.public;
 
     // Emulate transmitting as bytes
-    //let sk_bytes = sk.to_bytes().to_vec();
-    //let pk_bytes = pk.to_bytes().to_vec();
+    let sk_bytes = sk.to_bytes().to_vec();
+    let pk_bytes = pk.to_bytes().to_vec();
 
     // Check converting back into keys
-    //let sk2 = Ed25519::try_sk_from(sk_bytes).expect("sk is not correct");
-    //let pk2 = Ed25519::try_pk_from(pk_bytes).expect("pk is not correct");
+    let sk2 = Ed25519::try_sk_from(sk_bytes).expect("sk is not correct");
+    let pk2 = Ed25519::try_pk_from(pk_bytes).expect("pk is not correct");
 
     // Instantiate Ecies & Encrypt
-    let enc = Ed25519XChaCha20Poly1305Aead::new(pk);
+    let enc = Ed25519XChaCha20Poly1305Aead::new(pk2);
     let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
 
     // Decrypt
     let plaintext =
-        Ed25519XChaCha20Poly1305Aead::decrypt(sk, &ciphertext).expect("decryption failed");
+        Ed25519XChaCha20Poly1305Aead::decrypt(sk2, &ciphertext).expect("decryption failed");
 
     assert_eq!(LOREM_IPSUM.to_vec(), plaintext);
 }
@@ -170,20 +170,20 @@ fn ed25519_xchachapoly1305_syn() {
     let pk = kp.public;
 
     // Emulate transmitting as bytes
-    //let sk_bytes = sk.to_bytes().to_vec();
-    //let pk_bytes = pk.to_bytes().to_vec();
+    let sk_bytes = sk.to_bytes().to_vec();
+    let pk_bytes = pk.to_bytes().to_vec();
 
     // Check converting back into keys
-    //let sk2 = Ed25519::try_sk_from(sk_bytes).expect("sk is not correct");
-    //let pk2 = Ed25519::try_pk_from(pk_bytes).expect("pk is not correct");
+    let sk2 = Ed25519::try_sk_from(sk_bytes).expect("sk is not correct");
+    let pk2 = Ed25519::try_pk_from(pk_bytes).expect("pk is not correct");
 
     // Instantiate Ecies & Encrypt
-    let enc = Ed25519XChaCha20Poly1305Syn::new(pk);
+    let enc = Ed25519XChaCha20Poly1305Syn::new(pk2);
     let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
 
     // Decrypt
     let plaintext =
-        Ed25519XChaCha20Poly1305Syn::decrypt(sk, &ciphertext).expect("decryption failed");
+        Ed25519XChaCha20Poly1305Syn::decrypt(sk2, &ciphertext).expect("decryption failed");
 
     assert_eq!(LOREM_IPSUM.to_vec(), plaintext);
 }
