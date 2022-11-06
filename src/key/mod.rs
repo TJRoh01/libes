@@ -7,3 +7,8 @@ pub(crate) mod generics;
 mod x25519;
 #[cfg(feature = "x25519")]
 pub use x25519::X25519;
+
+#[cfg(feature = "ed25519")]
+mod ed25519;
+#[cfg(feature = "ed25519")]
+pub use ed25519::Ed25519;
