@@ -1,6 +1,6 @@
 [package]
     name = "libes"
-    version = "0.4.1"
+    version = "0.5.0"
     authors = ["Tomas Rohatynski"]
     edition = "2021"
     rust-version = "1.60"
@@ -37,6 +37,7 @@
     P-256 = ["secp256r1"]
     secp256r1 = []
 # Encryption
+    ChaCha20-Poly1305 = ["dep:chacha20poly1305"]
     XChaCha20-Poly1305 = ["dep:chacha20poly1305"]
     AES256-GCM = ["dep:aes-gcm"]
 # Authentication
