@@ -371,7 +371,7 @@ Matrix entries are of form `Encryption & Decryption` or `Encryption`/`Decryption
 |:-----------------------:|:-------------:|:-------------:|:-------------:|
 |    ChaCha20-Poly1305    | 🚫[^1]/🚫[^2] | 🚫[^1]/🚫[^2] | 🚫[^1]/🚫[^2] |
 |   XChaCha20-Poly1305    |      🚀       |      🚀       |      🚀       |
-|         AES256-GCM         |      📅       |      📅       |      📅       |
+|       AES256-GCM        |      🚀       |      🚀       |      🚀       |
 
 ## Authentication Support Matrix
 | Algorithm/ECIES Variant | ECIES-MAC |
