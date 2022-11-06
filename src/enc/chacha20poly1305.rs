@@ -44,7 +44,7 @@ impl Encryption for ChaCha20Poly1305 {
                 aad: b"",
             },
         )
-            .map_err(|_| EciesError::EncryptionError)
+        .map_err(|_| EciesError::EncryptionError)
     }
 
     fn decrypt(key: &[u8], nonce: &[u8], ciphertext: &[u8]) -> Result<Vec<u8>, EciesError> {
@@ -58,6 +58,6 @@ impl Encryption for ChaCha20Poly1305 {
                 aad: b"",
             },
         )
-            .map_err(|_| EciesError::DecryptionError)
+        .map_err(|_| EciesError::DecryptionError)
     }
 }
