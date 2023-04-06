@@ -435,7 +435,8 @@ where
 
         // Derive
         let shared_secret = K::key_exchange(&self.recipient_pk, ephemeral_sk);
-        let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENCRYPTION_KEY_LEN);
+        let mut derived_key =
+            K::derive_key_material(&ephemeral_pk, shared_secret, E::ENCRYPTION_KEY_LEN);
         let enc_key = E::get_encryption_key(&mut derived_key)?;
 
         // Process
@@ -469,7 +470,8 @@ where
         let nonce = E::get_nonce(&mut ciphertext)?;
 
         let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.into_sk());
-        let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENCRYPTION_KEY_LEN);
+        let mut derived_key =
+            K::derive_key_material(&ephemeral_pk, shared_secret, E::ENCRYPTION_KEY_LEN);
         let enc_key = E::get_encryption_key(&mut derived_key)?;
 
         E::decrypt(&enc_key, &nonce, &ciphertext)
