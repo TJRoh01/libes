@@ -28,18 +28,16 @@ In doing this I commit myself to:
 # Table of Contents
 <!-- TOC -->
 * [libes](#libes)
-  * [Why use libes?](#why-use-libes)
+    * [Why use libes?](#why-use-libes)
 * [Table of Contents](#table-of-contents)
 * [About](#about)
-  * [Encryption Scheme Support](#encryption-scheme-support)
-    * [Support icon legend](#support-icon-legend)
-    * [Elliptic Curve Key Support Matrix](#elliptic-curve-key-support-matrix)
-    * [Encryption Support Matrix](#encryption-support-matrix)
-  * [What is ECIES?](#what-is-ecies)
-  * [How does ECIES work?](#how-does-ecies-work)
-  * [Compact mode](#compact-mode)
-  * [How does compact mode work?](#how-does-compact-mode-work)
-  * [Conditional Compilation](#conditional-compilation)
+    * [Encryption Scheme Support](#encryption-scheme-support)
+        * [Support icon legend](#support-icon-legend)
+        * [Elliptic Curve Key Support Matrix](#elliptic-curve-key-support-matrix)
+        * [Encryption Support Matrix](#encryption-support-matrix)
+    * [What is ECIES?](#what-is-ecies)
+    * [Compact mode](#compact-mode)
+    * [Conditional Compilation](#conditional-compilation)
 * [License](#license)
 * [Contributing](#contributing)
 <!-- TOC -->
@@ -83,88 +81,13 @@ ECIES stands for Elliptic Curve Integrated Encryption Scheme.
 It is a type of cryptographic procedure which allows encrypting data
 for a specific recipient given only the data to be encrypted and
 the recipients public key, everything else is derived from the input
-or generated with a 
+or generated with a
 CSPRNG (Cryptographically Secure Pseudo-Random Number Generator).
 
 [Wikipedia](https://en.wikipedia.org/wiki/Integrated_Encryption_Scheme)  
 [Crypto++](https://www.cryptopp.com/wiki/Elliptic_Curve_Integrated_Encryption_Scheme)
 
-## How does ECIES work?
-The following graph illustrates the behavior of an ECIES implementation with
-algorithm types and suggested variants.
-
-Color coding:
-- Green: Elliptic Curve Key
-- Red: Encryption
-- Blue: Message Authentication
-```mermaid
-graph TB
-    subgraph Input
-        RK(Recipient's Public Key)
-        MSG(Plaintext)
-    end
-    
-    subgraph Generate
-        CSPRNG(CSPRNG)
-        EK(Ephemeral Key)
-        EK_PUB(Ephemeral Public Key)
-        EK_PRI(Ephemeral Private Key)
-        IV(IV/Nonce)
-    end
-    
-    subgraph Derive
-        DER_FN("Derive Shared Secret</br>(e.g. with ECDH)")
-        DER_ENC_KEY("Derive Encryption Key</br>(e.g. with HMAC)")
-        DER_MAC_KEY("Derive MAC Key</br>(e.g. with HMAC)")
-    end
-    
-    subgraph Process
-        ENC_FN("Encrypt</br>(e.g. with AES-GCM)")
-        MAC_FN("MAC</br>(e.g. with HMAC)")
-    end
-    
-    subgraph Output
-        ENC_OUT(Ciphertext)
-        IV_OUT(IV/Nonce)
-        EK_OUT(Ephemeral Public Key)
-        MAC_OUT(MAC)
-    end
-    
-    CSPRNG --> IV & EK
-    EK --> EK_PUB & EK_PRI
-    EK_PUB --> EK_OUT & MAC_FN
-    IV --> IV_OUT & MAC_FN & ENC_FN
-    RK --> DER_FN
-    EK_PRI --> DER_FN
-    DER_FN --> DER_ENC_KEY & DER_MAC_KEY
-    DER_ENC_KEY --> ENC_FN
-    DER_MAC_KEY --> MAC_FN
-    MSG --> ENC_FN
-    ENC_FN --> MAC_FN & ENC_OUT
-    MAC_FN --> MAC_OUT
-    
-    %% Elliptic Curve Key link colorization
-    linkStyle 2 stroke:#98FB98,stroke-width:2px;
-    linkStyle 3 stroke:#98FB98,stroke-width:2px;
-    linkStyle 4 stroke:#98FB98,stroke-width:2px;
-    linkStyle 9 stroke:#98FB98,stroke-width:2px;
-    linkStyle 10 stroke:#98FB98,stroke-width:2px;
-    
-    %% Message Authentication link colorization
-    linkStyle 5 stroke:#0096ff,stroke-width:2px;
-    linkStyle 7 stroke:#0096ff,stroke-width:2px;
-    linkStyle 12 stroke:#0096ff,stroke-width:2px;
-    linkStyle 14 stroke:#0096ff,stroke-width:2px;
-    linkStyle 16 stroke:#0096ff,stroke-width:2px;
-    linkStyle 18 stroke:#0096ff,stroke-width:2px;
-    
-    %% Encryption link colorization
-    linkStyle 8 stroke:#f88379,stroke-width:2px;
-    linkStyle 11 stroke:#f88379,stroke-width:2px;
-    linkStyle 13 stroke:#f88379,stroke-width:2px;
-    linkStyle 15 stroke:#f88379,stroke-width:2px;
-    linkStyle 17 stroke:#f88379,stroke-width:2px;
-```
+**NOTE:** For ECIES flowchart see the README.md on [GitHub](https://github.com/TJRoh01/libes/blob/main/README.md).
 
 ## Compact mode
 **DISCLAIMER:** Compact mode is my own implementation idea, which I will only
@@ -175,86 +98,24 @@ in the future. If compact mode turns out to be useful/popular and resources allo
 I will make sure compact mode receives a security audit.
 
 Normally ECIES uses an encryption algorithm for the data, and then a MAC
-on the resulting ciphertext & other output necessary to decrypt the data.  
+on the resulting ciphertext & other output necessary to decrypt the data.
 
 By using an AEAD (Authenticated Encryption with Associated Data)
 encryption algorithm like AES-GCM or ChaCha20-Poly1305 there is no more
-need for an additional MAC, because it is already included in the encryption.  
+need for an additional MAC, because it is already included in the encryption.
 
 On top of that the Initialization Vector or nonce can be derived from the
 key-agreement operation since the ephemeral private key is randomly generated
 which results in the derived IV/nonce still being unique per message.
 
 The now redundant additional MAC and IV/nonce can be omitted,
-saving a couple dozen bytes on each message. 
+saving a couple dozen bytes on each message.
 
 The `Compact` column in the support matrices indicates if the mode is supported.
 To use compact mode both the Elliptic Curve Key and Encryption algorithms must
 indicate support.
 
-## How does compact mode work?
-The following graph illustrates the behavior of a Compact ECIES implementation with
-algorithm types and suggested variants.
-
-Color coding:
-- Green: Elliptic Curve Key
-- Red: Encryption
-- Blue: Message Authentication
-```mermaid
-graph TB
-    subgraph Input
-        RK(Recipient's Public Key)
-        MSG(Plaintext)
-    end
-    %%
-    subgraph Generate
-        CSPRNG(CSPRNG)
-        EK(Ephemeral Key)
-        EK_PUB(Ephemeral Public Key)
-        EK_PRI(Ephemeral Private Key)
-    end
-    
-    subgraph Derive
-        DER_FN("Derive Shared Secret</br>(e.g. with ECDH)")
-        DER_IV("Derive IV/Nonce</br>(e.g. with HMAC)")
-        DER_ENC_KEY("Derive Encryption Key</br>(e.g. with HMAC)")
-    end
-    
-    subgraph Process
-        ENC_FN("Encrypt using AEAD</br>(e.g. with AES-GCM)")
-    end
-    
-    subgraph Output
-        ENC_OUT(Ciphertext)
-        EK_OUT(Ephemeral Public Key)
-    end
-    
-    CSPRNG --> EK
-    EK --> EK_PUB & EK_PRI
-    EK_PUB --> EK_OUT
-    RK --> DER_FN
-    EK_PRI --> DER_FN
-    DER_FN --> DER_ENC_KEY & DER_IV
-    DER_IV --> ENC_FN
-    DER_ENC_KEY --> ENC_FN
-    MSG --> ENC_FN
-    ENC_FN --> ENC_OUT
-    
-    %% Elliptic Curve Key link colorization
-    linkStyle 1 stroke:#98FB98,stroke-width:2px;
-    linkStyle 2 stroke:#98FB98,stroke-width:2px;
-    linkStyle 3 stroke:#98FB98,stroke-width:2px;
-    linkStyle 4 stroke:#98FB98,stroke-width:2px;
-    linkStyle 5 stroke:#98FB98,stroke-width:2px;
-    
-    %% Message Authentication link colorization
-    linkStyle 7 stroke:#0096ff,stroke-width:2px;
-    linkStyle 8 stroke:#0096ff,stroke-width:2px;
-    
-    %% Encryption link colorization
-    linkStyle 6 stroke:#f88379,stroke-width:2px;
-    linkStyle 9 stroke:#f88379,stroke-width:2px;
-```
+**NOTE:** For Compact ECIES flowchart see the README.md on [GitHub](https://github.com/TJRoh01/libes/blob/main/README.md).
 
 ## Conditional Compilation
 All algorithm combinations are gated behind features, to reduce how much is

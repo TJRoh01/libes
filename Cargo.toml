@@ -1,10 +1,10 @@
 [package]
 name = "libes"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Tomas Rohatynski"]
 edition = "2021"
 description = "Collection of Elliptic Curve Integrated Encryption Scheme(s)"
-readme = "README.md"
+readme = "README_CRATES_IO.md"
 homepage = "https://gitlab.com/TJRoh01/libes"
 repository = "https://gitlab.com/TJRoh01/libes"
 license = "MIT OR Apache-2.0"
