@@ -24,12 +24,12 @@ use auth::Syn;
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD"))]
 use enc::generics::GenNonce;
 
-use std::marker::PhantomData;
-
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
-use key::generics::{DeriveKeyMaterial, GenerateEphemeralKey, GenericSecretKey, Key, KeyExchange, SplitEphemeralKey};
+use key::{IntoSecretKey, generics::{DeriveKeyMaterial, GenerateEphemeralKey, Key, KeyExchange, SplitEphemeralKey}};
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
 use enc::generics::{Encryption, SplitEncKey, SplitNonce};
+
+use std::marker::PhantomData;
 
 pub struct Ecies<K, E, A> {
     recipient_pk: K,
@@ -90,14 +90,14 @@ impl<K, E, A> Ecies<K, E, A>
         E: Encryption + SplitNonce + SplitEncKey + EciesMacSupport,
         A: Mac + SplitMac
 {
-    pub fn decrypt<T: Into<GenericSecretKey<K::SecretKey>>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
+    pub fn decrypt<T: IntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
         let mut ciphertext = ciphertext.to_vec();
 
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
         let nonce = E::get_nonce(&mut ciphertext);
         let mac = A::get_mac(&mut ciphertext);
 
-        let shared_secret = K::key_exchange(&ephemeral_pk, sk.into());
+        let shared_secret = K::key_exchange(&ephemeral_pk, sk.into_sk());
         let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN + A::MAC_KEY_LEN);
         let enc_key = E::get_enc_key(&mut derived_key);
         let mac_key = A::get_mac_key(&mut derived_key);
@@ -142,13 +142,13 @@ impl<K, E> Ecies<K, E, Aead>
         K: Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial + EciesAeadSupport,
         E: Encryption + SplitNonce + SplitEncKey + EciesAeadSupport
 {
-    pub fn decrypt<T: Into<GenericSecretKey<K::SecretKey>>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
+    pub fn decrypt<T: IntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
         let mut ciphertext = ciphertext.to_vec();
 
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
         let nonce = E::get_nonce(&mut ciphertext);
 
-        let shared_secret = K::key_exchange(&ephemeral_pk, sk.into());
+        let shared_secret = K::key_exchange(&ephemeral_pk, sk.into_sk());
         let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN);
         let enc_key = E::get_enc_key(&mut derived_key);
 
@@ -190,12 +190,12 @@ impl<K, E> Ecies<K, E, Syn>
         K: Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
         E: Encryption + SplitNonce + SplitEncKey
 {
-    pub fn decrypt<T: Into<GenericSecretKey<K::SecretKey>>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
+    pub fn decrypt<T: IntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
         let mut ciphertext = ciphertext.to_vec();
 
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
 
-        let shared_secret = K::key_exchange(&ephemeral_pk, sk.into());
+        let shared_secret = K::key_exchange(&ephemeral_pk, sk.into_sk());
         let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN + E::ENC_NONCE_LEN);
         let enc_key = E::get_enc_key(&mut derived_key);
         let nonce = E::get_nonce(&mut derived_key);

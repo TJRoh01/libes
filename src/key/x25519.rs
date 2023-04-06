@@ -1,6 +1,6 @@
 use rand_core::OsRng;
-use crate::key::generics::GenericSecretKey;
-use super::generics::{Key, GenerateEphemeralKey, KeyExchange};
+use x25519_dalek::StaticSecret;
+use super::{SecretKeyFrom, generics::{Key, GenerateEphemeralKey, KeyExchange}};
 
 #[cfg(feature = "ECIES-MAC")]
 use crate::markers::EciesMacSupport;
@@ -41,26 +41,29 @@ impl From<x25519_dalek::PublicKey> for X25519 {
     fn from(x: x25519_dalek::PublicKey) -> Self { Self(x) }
 }
 
-impl From<[u8; 32]> for GenericSecretKey<x25519_dalek::StaticSecret> {
-    fn from(x: [u8; 32]) -> Self { Self(x25519_dalek::StaticSecret::from(x)) }
+impl SecretKeyFrom<[u8; 32]> for X25519 {
+    fn sk_from(x: [u8; 32]) -> Self::SecretKey {
+        x25519_dalek::StaticSecret::from(x)
+    }
 }
 
-impl From<&[u8]> for GenericSecretKey<x25519_dalek::StaticSecret> {
-    fn from(x: &[u8]) -> Self {
+impl SecretKeyFrom<&[u8]> for X25519 {
+    fn sk_from(x: &[u8]) -> Self::SecretKey {
         let bytes: [u8; 32] = x.try_into().unwrap();
         bytes.into()
     }
 }
 
-impl From<Vec<u8>> for GenericSecretKey<x25519_dalek::StaticSecret> {
-    fn from(x: Vec<u8>) -> Self {
+impl SecretKeyFrom<Vec<u8>> for X25519 {
+    fn sk_from(x: Vec<u8>) -> Self::SecretKey {
         let bytes: [u8; 32] = x.try_into().unwrap();
         bytes.into()
     }
 }
 
-impl From<x25519_dalek::StaticSecret> for GenericSecretKey<x25519_dalek::StaticSecret> {
-    fn from(x: x25519_dalek::StaticSecret) -> Self { Self(x) }
+
+impl SecretKeyFrom<x25519_dalek::StaticSecret> for X25519 {
+    fn sk_from(x: StaticSecret) -> Self::SecretKey { x }
 }
 
 impl Key for X25519 {
@@ -73,14 +76,14 @@ impl Key for X25519 {
 }
 
 impl GenerateEphemeralKey for X25519 {
-    fn get_ephemeral_key() -> (Self, GenericSecretKey<Self::SecretKey>) {
+    fn get_ephemeral_key() -> (Self, Self::SecretKey) {
         let sk = x25519_dalek::StaticSecret::new(OsRng);
-        (Self(x25519_dalek::PublicKey::from(&sk)), GenericSecretKey(sk))
+        (Self(x25519_dalek::PublicKey::from(&sk)), sk)
     }
 }
 
 impl KeyExchange for X25519 {
-    fn key_exchange(&self, sk: GenericSecretKey<Self::SecretKey>) -> Vec<u8> {
-        sk.0.diffie_hellman(&self.0).to_bytes().to_vec()
+    fn key_exchange(&self, sk: Self::SecretKey) -> Vec<u8> {
+        sk.diffie_hellman(&self.0).to_bytes().to_vec()
     }
 }
