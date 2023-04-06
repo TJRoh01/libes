@@ -34,8 +34,7 @@ impl Encryption for Aes256Gcm {
     const ENCRYPTION_NONCE_LEN: usize = 12;
 
     fn encrypt(key: &[u8], nonce: &[u8], plaintext: &[u8]) -> Result<Vec<u8>, EciesError> {
-        let enc = aes_gcm::Aes256Gcm::new_from_slice(key)
-            .map_err(|_| EciesError::BadData)?;
+        let enc = aes_gcm::Aes256Gcm::new_from_slice(key).map_err(|_| EciesError::BadData)?;
 
         enc.encrypt(
             nonce.into(),
@@ -44,12 +43,11 @@ impl Encryption for Aes256Gcm {
                 aad: b"",
             },
         )
-            .map_err(|_| EciesError::EncryptionError)
+        .map_err(|_| EciesError::EncryptionError)
     }
 
     fn decrypt(key: &[u8], nonce: &[u8], ciphertext: &[u8]) -> Result<Vec<u8>, EciesError> {
-        let dec = aes_gcm::Aes256Gcm::new_from_slice(key)
-            .map_err(|_| EciesError::BadData)?;
+        let dec = aes_gcm::Aes256Gcm::new_from_slice(key).map_err(|_| EciesError::BadData)?;
 
         dec.decrypt(
             nonce.into(),
@@ -58,6 +56,6 @@ impl Encryption for Aes256Gcm {
                 aad: b"",
             },
         )
-            .map_err(|_| EciesError::DecryptionError)
+        .map_err(|_| EciesError::DecryptionError)
     }
 }
