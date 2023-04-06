@@ -122,7 +122,7 @@ graph TB
     end
     
     subgraph Derive
-        DER_FN("Derive Shared Secret</br>(e.g. with ECDH -> SHA512)</br><- and split ->")
+        DER_FN("Derive Shared Secret</br>(e.g. with ECDH -> HKDF-SHA256)</br><- and split ->")
         DER_ENC_KEY("Derived Encryption Key")
         DER_MAC_KEY("Derived MAC Key")
     end
@@ -194,7 +194,7 @@ graph TB
     end
     
     subgraph Derive
-        DER_FN("Derive Shared Secret</br>(e.g. with ECDH -> SHA256)")
+        DER_FN("Derive Shared Secret</br>(e.g. with ECDH -> HKDD-SHA256)")
         DER_ENC_KEY("Derived Encryption Key")
     end
     
@@ -255,7 +255,7 @@ graph TB
     end
     
     subgraph Derive
-        DER_FN("Derive Shared Secret</br>(e.g. with ECDH -> SHA512)</br><- and split ->")
+        DER_FN("Derive Shared Secret</br>(e.g. with ECDH -> HKDF-SHA256)</br><- and split ->")
         DER_IV("Derived IV/Nonce")
         DER_ENC_KEY("Derived Encryption Key")
     end
