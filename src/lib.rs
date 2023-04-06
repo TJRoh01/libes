@@ -1,4 +1,56 @@
-mod markers;
+//! # libes
+//! ![Crates.io](https://img.shields.io/crates/l/libes?style=flat)
+//! [![GitHub last commit](https://img.shields.io/github/last-commit/TJRoh01/libes?style=flat)](https://github.com/TJRoh01/libes)
+//! [![Crates.io](https://img.shields.io/crates/v/libes?style=flat)](https://crates.io/crates/libes)
+//! [![docs.rs](https://img.shields.io/docsrs/libes/latest?style=flat)](https://docs.rs/libes/latest/libes)
+//! [![Libraries.io](https://img.shields.io/librariesio/release/cargo/libes?style=flat)](https://libraries.io/cargo/libes)
+//!
+//! **lib**rary of **e**ncryption **s**cheme(s) is a collection of ECIES variants.
+//!
+//! The goal of this is library is to become a one-stop shop for everything ECIES.
+//!
+//! ## Algorithm support
+//! Matrix entries are of form Encryption/Decryption
+//!
+//! ### Support icon legend
+//! - 🚀 Completed
+//! - 🏗️ Development
+//! - 📅 Planned
+//! - 🤔 Planning
+//! - 🚫 Can/Will not implement
+//!
+//! ### Elliptic Curve Support Matrix
+//! |     Algorithm     | ECIES-MAC | ECIES-AEAD | ECIES-SYN |
+//! |:-----------------:|:---------:|:----------:|:---------:|
+//! |      x25519       |    🚀/🚀    |    🚀/🚀     |    🚀/🚀     |
+//! |      ed25519      |    🏗️/🏗️    |    🏗️/🏗️     |    🏗️/🏗️      |
+//! | K-256 / secp256k1 |    🤔/🤔     |     🤔/🤔     |    🤔/🤔     |
+//! | P-256 / secp256r1 |    🤔/🤔     |     🤔/🤔     |    🤔/🤔     |
+//! | P-384 / secp384r1 |    🤔/🤔     |     🤔/🤔     |    🤔/🤔     |
+//! | P-521 / secp521r1 |    🤔/🤔     |     🤔/🤔     |    🤔/🤔     |
+//!
+//! ### Encryption Support Matrix
+//! |     Algorithm      | ECIES-MAC | ECIES-AEAD | ECIES-SYN |
+//! |:------------------:|:---------:|:----------:|:---------:|
+//! | ChaCha20-Poly1305  |  🚫[^1]/🚫[^2]   |   🚫[^1]/🚫[^2]   |  🚫[^1]/🚫[^2]   |
+//! | XChaCha20-Poly1305 |    🚀/🚀    |    🚀/🚀     |    🚀/🚀     |
+//! |      AES-GCM       |    🤔/🤔     |     🤔/🤔     |    🤔/🤔     |
+//!
+//! ### Authentication Support Matrix
+//! |  Algorithm  | ECIES-MAC |
+//! |:-----------:|:---------:|
+//! | HMAC-SHA256 |    🚀/🚀    |
+//! | HMAC-SHA512 |    🤔/🤔     |
+//!
+//! [^1]: ChaCha20 uses a 96-bit nonce,
+//! which when generated using a random function has an unsatisfactory
+//! risk of collision. XChaCha20 uses a 192-bit nonce
+//! where that is no longer an issue.
+//!
+//! [^2]: Will not encourage using potentially weak encryption [^1]
+//! by implementing decryption for it
+
+pub mod markers;
 pub mod key;
 pub mod enc;
 pub mod auth;
@@ -52,8 +104,8 @@ impl<K: Key, E, A> Ecies<K, E, A> {
 #[cfg(feature = "ECIES-MAC")]
 impl<K, E, A> Ecies<K, E, A>
 where
-    K: EciesMacEncryptionSupport + EciesMacDecryptionSupport + Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
-    E: EciesMacEncryptionSupport + EciesMacDecryptionSupport + Encryption + GenNonce + SplitEncKey,
+    K: EciesMacEncryptionSupport + Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
+    E: EciesMacEncryptionSupport + Encryption + GenNonce + SplitEncKey,
     A: Mac + SplitMacKey
 {
     pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
@@ -85,8 +137,8 @@ where
 #[cfg(feature = "ECIES-MAC")]
 impl<K, E, A> Ecies<K, E, A>
 where
-    K: EciesMacEncryptionSupport + EciesMacDecryptionSupport + Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
-    E: EciesMacEncryptionSupport + EciesMacDecryptionSupport + Encryption + SplitNonce + SplitEncKey,
+    K: EciesMacDecryptionSupport + Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
+    E: EciesMacDecryptionSupport + Encryption + SplitNonce + SplitEncKey,
     A: Mac + SplitMac
 {
     pub fn decrypt<T: IntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
@@ -109,8 +161,8 @@ where
 #[cfg(feature = "ECIES-AEAD")]
 impl<K, E> Ecies<K, E, Aead>
 where
-    K: EciesAeadEncryptionSupport + EciesAeadDecryptionSupport + Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
-    E: EciesAeadEncryptionSupport + EciesAeadDecryptionSupport + Encryption + GenNonce + SplitEncKey
+    K: EciesAeadEncryptionSupport + Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
+    E: EciesAeadEncryptionSupport + Encryption + GenNonce + SplitEncKey
 {
     pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
         // Generate
@@ -138,8 +190,8 @@ where
 #[cfg(feature = "ECIES-AEAD")]
 impl<K, E> Ecies<K, E, Aead>
 where
-    K: EciesAeadEncryptionSupport + EciesAeadDecryptionSupport + Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
-    E: EciesAeadEncryptionSupport + EciesAeadDecryptionSupport + Encryption + SplitNonce + SplitEncKey
+    K: EciesAeadDecryptionSupport + Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
+    E: EciesAeadDecryptionSupport + Encryption + SplitNonce + SplitEncKey
 {
     pub fn decrypt<T: IntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
         let mut ciphertext = ciphertext.to_vec();
@@ -158,8 +210,8 @@ where
 #[cfg(feature = "ECIES-SYN")]
 impl<K, E> Ecies<K, E, Syn>
 where
-    K: EciesSynEncryptionSupport + EciesSynDecryptionSupport + Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
-    E: EciesSynEncryptionSupport + EciesSynDecryptionSupport + Encryption + SplitNonce + SplitEncKey
+    K: EciesSynEncryptionSupport + Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
+    E: EciesSynEncryptionSupport + Encryption + SplitNonce + SplitEncKey
 {
     pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
         // Generate
@@ -186,8 +238,8 @@ where
 #[cfg(feature = "ECIES-SYN")]
 impl<K, E> Ecies<K, E, Syn>
 where
-    K: EciesSynEncryptionSupport + EciesSynDecryptionSupport + Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
-    E: EciesSynEncryptionSupport + EciesSynDecryptionSupport + Encryption + SplitNonce + SplitEncKey
+    K: EciesSynDecryptionSupport + Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
+    E: EciesSynDecryptionSupport + Encryption + SplitNonce + SplitEncKey
 {
     pub fn decrypt<T: IntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
         let mut ciphertext = ciphertext.to_vec();

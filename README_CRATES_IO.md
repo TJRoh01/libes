@@ -1,9 +1,9 @@
 # libes
-![Crates.io](https://img.shields.io/crates/l/libes?style=for-the-badge)
-[![GitHub last commit](https://img.shields.io/github/last-commit/TJRoh01/libes?style=for-the-badge)](https://github.com/TJRoh01/libes)
-[![Crates.io](https://img.shields.io/crates/v/libes?style=for-the-badge)](https://crates.io/crates/libes)
-[![docs.rs](https://img.shields.io/docsrs/libes/latest?style=for-the-badge)](https://docs.rs/libes/latest/libes)
-[![Libraries.io](https://img.shields.io/librariesio/release/cargo/libes?style=for-the-badge)](https://libraries.io/cargo/libes)
+![Crates.io](https://img.shields.io/crates/l/libes?style=flat)
+[![GitHub last commit](https://img.shields.io/github/last-commit/TJRoh01/libes?style=flat)](https://github.com/TJRoh01/libes)
+[![Crates.io](https://img.shields.io/crates/v/libes?style=flat)](https://crates.io/crates/libes)
+[![docs.rs](https://img.shields.io/docsrs/libes/latest?style=flat)](https://docs.rs/libes/latest/libes)
+[![Libraries.io](https://img.shields.io/librariesio/release/cargo/libes?style=flat)](https://libraries.io/cargo/libes)
 
 **lib**rary of **e**ncryption **s**cheme(s) is a collection of ECIES variants.
 
@@ -41,7 +41,7 @@ In doing this I commit myself to:
   * [SemVer](#semver)
   * [Release Tracks](#release-tracks)
   * [Conditional Compilation](#conditional-compilation)
-* [Encryption Scheme Support](#encryption-scheme-support)
+* [Algorithm support](#algorithm-support)
   * [Support icon legend](#support-icon-legend)
   * [Elliptic Curve Support Matrix](#elliptic-curve-support-matrix)
   * [Encryption Support Matrix](#encryption-support-matrix)
@@ -150,7 +150,9 @@ and Authentication algorithms must all support the same ECIES variant.
 - To use ECIES-MAC, all three chosen algorithms need a "🚀" in their respective ECIES-MAC columns
 - To use ECIES-AEAD or ECIES-SYN both first two algorithms need a "🚀" in the variant column
 
-# Encryption Scheme Support
+# Algorithm support
+Matrix entries are of form Encryption/Decryption
+
 ## Support icon legend
 - 🚀 Completed
 - 🏗️ Development
@@ -161,30 +163,33 @@ and Authentication algorithms must all support the same ECIES variant.
 ## Elliptic Curve Support Matrix
 |     Algorithm     | ECIES-MAC | ECIES-AEAD | ECIES-SYN |
 |:-----------------:|:---------:|:----------:|:---------:|
-|      x25519       |    🏗️    |    🏗️     |    📅     |
-|      ed25519      |    🏗️    |    🏗️     |    📅     |
-| K-256 / secp256k1 |    🤔     |     🤔     |    🤔     |
-| P-256 / secp256r1 |    🤔     |     🤔     |    🤔     |
-| P-384 / secp384r1 |    🤔     |     🤔     |    🤔     |
-| P-521 / secp521r1 |    🤔     |     🤔     |    🤔     |
+|      x25519       |   🚀/🚀   |   🚀/🚀    |   🚀/🚀   |
+|      ed25519      |  🏗️/🏗️  |  🏗️/🏗️   |  🏗️/🏗️  |
+| K-256 / secp256k1 |   🤔/🤔   |   🤔/🤔    |   🤔/🤔   |
+| P-256 / secp256r1 |   🤔/🤔   |   🤔/🤔    |   🤔/🤔   |
+| P-384 / secp384r1 |   🤔/🤔   |   🤔/🤔    |   🤔/🤔   |
+| P-521 / secp521r1 |   🤔/🤔   |   🤔/🤔    |   🤔/🤔   |
 
 ## Encryption Support Matrix
-|     Algorithm      | ECIES-MAC | ECIES-AEAD | ECIES-SYN |
-|:------------------:|:---------:|:----------:|:---------:|
-| ChaCha20-Poly1305  |  🚫[^1]   |   🚫[^1]   |  🚫[^1]   |
-| XChaCha20-Poly1305 |    🏗️    |    🏗️     |    📅     |
-|      AES-GCM       |    🤔     |     🤔     |    🤔     |
+|     Algorithm      |   ECIES-MAC   |  ECIES-AEAD   |   ECIES-SYN   |
+|:------------------:|:-------------:|:-------------:|:-------------:|
+| ChaCha20-Poly1305  | 🚫[^1]/🚫[^2] | 🚫[^1]/🚫[^2] | 🚫[^1]/🚫[^2] |
+| XChaCha20-Poly1305 |     🚀/🚀     |     🚀/🚀     |     🚀/🚀     |
+|      AES-GCM       |     🤔/🤔     |     🤔/🤔     |     🤔/🤔     |
 
 ## Authentication Support Matrix
 |  Algorithm  | ECIES-MAC |
 |:-----------:|:---------:|
-| HMAC-SHA256 |    🏗️    |
-| HMAC-SHA512 |    🤔     |
+| HMAC-SHA256 |   🚀/🚀   |
+| HMAC-SHA512 |   🤔/🤔   |
 
 [^1]: ChaCha20 uses a 96-bit nonce,
 which when generated using a random function has an unsatisfactory
 risk of collision. XChaCha20 uses a 192-bit nonce
 where that is no longer an issue.
+
+[^2]: Will not encourage using potentially weak encryption [^1]
+by implementing decryption for it
 
 # License
 Licensed under either of:
