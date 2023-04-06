@@ -271,7 +271,7 @@ graph TB
     end
     
     subgraph Output
-        ENC_OUT(Ciphertext)
+        ENC_OUT(Ciphertext</br>with Authentication Tag)
         EK_OUT(Ephemeral Public Key)
     end
     
