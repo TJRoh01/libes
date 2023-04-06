@@ -245,6 +245,34 @@ fn x25519_aes256gcm_aead() {
 }
 
 #[test]
+fn x25519_aes256gcm_syn() {
+    // Alias Ecies with algorithms
+    type X25519Aes256GcmSyn = Ecies<X25519, Aes256Gcm, Syn>;
+
+    // Generate receiver key pair
+    let sk = x25519_dalek::StaticSecret::new(OsRng);
+    let pk = x25519_dalek::PublicKey::from(&sk);
+
+    // Emulate transmitting as bytes
+    let sk_bytes = sk.to_bytes().to_vec();
+    let pk_bytes = pk.to_bytes().to_vec();
+
+    // Check converting back into keys
+    let sk2 = X25519::try_sk_from(sk_bytes).expect("sk is not correct");
+    let pk2 = X25519::try_pk_from(pk_bytes).expect("pk is not correct");
+
+    // Instantiate Ecies & Encrypt
+    let enc = X25519Aes256GcmSyn::new(pk2);
+    let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
+
+    // Decrypt
+    let plaintext =
+        X25519Aes256GcmSyn::decrypt(sk2, &ciphertext).expect("decryption failed");
+
+    assert_eq!(LOREM_IPSUM.to_vec(), plaintext);
+}
+
+#[test]
 fn ed25519_aes256gcm_hmacsha256() {
     // Alias Ecies with algorithms
     type Ed25519Aes256GcmHmacSha256 = Ecies<Ed25519, Aes256Gcm, HmacSha256>;
@@ -304,6 +332,38 @@ fn ed25519_aes256gcm_aead() {
     // Decrypt
     let plaintext =
         Ed25519Aes256GcmAead::decrypt(sk2, &ciphertext).expect("decryption failed");
+
+    assert_eq!(LOREM_IPSUM.to_vec(), plaintext);
+}
+
+#[test]
+fn ed25519_aes256gcm_syn() {
+    // Alias Ecies with algorithms
+    type Ed25519Aes256GcmSyn = Ecies<Ed25519, Aes256Gcm, Syn>;
+
+    let mut rng = rand::rngs::OsRng {};
+
+    // Generate receiver key pair
+    let kp = ed25519_dalek::Keypair::generate(&mut rng);
+
+    let sk = kp.secret;
+    let pk = kp.public;
+
+    // Emulate transmitting as bytes
+    let sk_bytes = sk.to_bytes().to_vec();
+    let pk_bytes = pk.to_bytes().to_vec();
+
+    // Check converting back into keys
+    let sk2 = Ed25519::try_sk_from(sk_bytes).expect("sk is not correct");
+    let pk2 = Ed25519::try_pk_from(pk_bytes).expect("pk is not correct");
+
+    // Instantiate Ecies & Encrypt
+    let enc = Ed25519Aes256GcmSyn::new(pk2);
+    let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
+
+    // Decrypt
+    let plaintext =
+        Ed25519Aes256GcmSyn::decrypt(sk2, &ciphertext).expect("decryption failed");
 
     assert_eq!(LOREM_IPSUM.to_vec(), plaintext);
 }

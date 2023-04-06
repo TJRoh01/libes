@@ -17,6 +17,13 @@ impl EciesAeadEncryptionSupport for Aes256Gcm {}
 #[cfg(feature = "ECIES-AEAD")]
 impl EciesAeadDecryptionSupport for Aes256Gcm {}
 
+#[cfg(feature = "ECIES-SYN")]
+use crate::markers::{EciesSynDecryptionSupport, EciesSynEncryptionSupport};
+#[cfg(feature = "ECIES-SYN")]
+impl EciesSynEncryptionSupport for Aes256Gcm {}
+#[cfg(feature = "ECIES-SYN")]
+impl EciesSynDecryptionSupport for Aes256Gcm {}
+
 /// Marker for using the `AES256-GCM` algorithm for encryption
 ///
 /// AES256-GCM is provided by [aes-gcm](https://crates.io/crates/aes-gcm)
