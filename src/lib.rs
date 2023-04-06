@@ -371,7 +371,7 @@ where
 
         // Output
         let mut out = Vec::new();
-        out.extend_from_slice(ephemeral_pk.as_bytes());
+        out.extend_from_slice(&ephemeral_pk.as_bytes());
         out.extend_from_slice(nonce.as_slice());
         out.extend_from_slice(mac.as_slice());
         out.extend_from_slice(ciphertext.as_slice());
@@ -436,7 +436,7 @@ where
 
         // Output
         let mut out = Vec::new();
-        out.extend_from_slice(ephemeral_pk.as_bytes());
+        out.extend_from_slice(&ephemeral_pk.as_bytes());
         out.extend_from_slice(nonce.as_slice());
         out.extend_from_slice(ciphertext.as_slice());
 
@@ -496,7 +496,7 @@ where
 
         // Output
         let mut out = Vec::new();
-        out.extend_from_slice(ephemeral_pk.as_bytes());
+        out.extend_from_slice(&ephemeral_pk.as_bytes());
         out.extend_from_slice(ciphertext.as_slice());
 
         Ok(out)
