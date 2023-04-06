@@ -77,12 +77,13 @@ use auth::Syn;
 use enc::generics::GenNonce;
 
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
-use key::{IntoPublicKey, IntoSecretKey, generics::{DeriveKeyMaterial, GenerateEphemeralKey, Key, KeyExchange, SplitEphemeralKey}};
+use key::{TryIntoPublicKey, TryIntoSecretKey, generics::{DeriveKeyMaterial, GenerateEphemeralKey, Key, KeyExchange, SplitEphemeralKey}};
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
 use enc::generics::{Encryption, SplitEncKey, SplitNonce};
 
 use std::marker::PhantomData;
 
+/// Generic `ECIES` instance
 pub struct Ecies<K, E, A> {
     recipient_pk: K,
     k: PhantomData<K>,
@@ -91,13 +92,14 @@ pub struct Ecies<K, E, A> {
 }
 
 impl<K: Key, E, A> Ecies<K, E, A> {
-    pub fn new<T: IntoPublicKey<K>>(key: T) -> Self {
-        Self {
-            recipient_pk: key.into_pk(),
+    /// Create a new `ECIES<K, E, A>` instance given `recipient_pk: Recipient Public Key` compatible with `K: Key`
+    pub fn new<T: TryIntoPublicKey<K>>(recipient_pk: T) -> Result<Self, ()> {
+        Ok(Self {
+            recipient_pk: recipient_pk.try_into_pk()?,
             k: PhantomData,
             e: PhantomData,
             a: PhantomData
-        }
+        })
     }
 }
 
@@ -108,6 +110,7 @@ where
     E: EciesMacEncryptionSupport + Encryption + GenNonce + SplitEncKey,
     A: Mac + SplitMacKey
 {
+    /// Encrypt `plaintext` using the `ECIES-MAC` variant
     pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
         // Generate
         let (ephemeral_pk, ephemeral_sk) = K::get_ephemeral_key();
@@ -141,14 +144,15 @@ where
     E: EciesMacDecryptionSupport + Encryption + SplitNonce + SplitEncKey,
     A: Mac + SplitMac
 {
-    pub fn decrypt<T: IntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
+    /// Decrypt `ciphertext` using the `ECIES-MAC` variant
+    pub fn decrypt<T: TryIntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
         let mut ciphertext = ciphertext.to_vec();
 
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
         let nonce = E::get_nonce(&mut ciphertext);
         let mac = A::get_mac(&mut ciphertext);
 
-        let shared_secret = K::key_exchange(&ephemeral_pk, sk.into_sk());
+        let shared_secret = K::key_exchange(&ephemeral_pk, sk.try_into_sk()?);
         let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN + A::MAC_KEY_LEN);
         let enc_key = E::get_enc_key(&mut derived_key);
         let mac_key = A::get_mac_key(&mut derived_key);
@@ -164,6 +168,7 @@ where
     K: EciesAeadEncryptionSupport + Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
     E: EciesAeadEncryptionSupport + Encryption + GenNonce + SplitEncKey
 {
+    /// Encrypt `plaintext` using the `ECIES-AEAD` variant
     pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
         // Generate
         let (ephemeral_pk, ephemeral_sk) = K::get_ephemeral_key();
@@ -193,13 +198,14 @@ where
     K: EciesAeadDecryptionSupport + Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
     E: EciesAeadDecryptionSupport + Encryption + SplitNonce + SplitEncKey
 {
-    pub fn decrypt<T: IntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
+    /// Decrypt `ciphertext` using the `ECIES-AEAD` variant
+    pub fn decrypt<T: TryIntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
         let mut ciphertext = ciphertext.to_vec();
 
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
         let nonce = E::get_nonce(&mut ciphertext);
 
-        let shared_secret = K::key_exchange(&ephemeral_pk, sk.into_sk());
+        let shared_secret = K::key_exchange(&ephemeral_pk, sk.try_into_sk()?);
         let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN);
         let enc_key = E::get_enc_key(&mut derived_key);
 
@@ -213,6 +219,7 @@ where
     K: EciesSynEncryptionSupport + Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
     E: EciesSynEncryptionSupport + Encryption + SplitNonce + SplitEncKey
 {
+    /// Encrypt `plaintext` using the `ECIES-SYN` variant
     pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
         // Generate
         let (ephemeral_pk, ephemeral_sk) = K::get_ephemeral_key();
@@ -241,12 +248,13 @@ where
     K: EciesSynDecryptionSupport + Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
     E: EciesSynDecryptionSupport + Encryption + SplitNonce + SplitEncKey
 {
-    pub fn decrypt<T: IntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
+    /// Decrypt `ciphertext` using the `ECIES-SYN` variant
+    pub fn decrypt<T: TryIntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
         let mut ciphertext = ciphertext.to_vec();
 
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
 
-        let shared_secret = K::key_exchange(&ephemeral_pk, sk.into_sk());
+        let shared_secret = K::key_exchange(&ephemeral_pk, sk.try_into_sk()?);
         let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN + E::ENC_NONCE_LEN);
         let enc_key = E::get_enc_key(&mut derived_key);
         let nonce = E::get_nonce(&mut derived_key);
