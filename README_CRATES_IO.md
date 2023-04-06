@@ -16,36 +16,42 @@ and I want to share my findings with those who are trying to make sense of it li
 
 In doing this I commit myself to:
 - Maintaining a curated selection of relevant crates
-    - Verifying that dependencies have not made mistakes in their implementations
-    - Using dependencies with good performance and a high quality of code and documentation
+  - Verifying that dependencies have not made mistakes in their implementations
+  - Using dependencies with good performance and a high quality of code and documentation
 - Providing a uniform and predictable API
-    - Using shared constructors in the API to guarantee uniformity
-    - Guaranteeing long-term support for all major releases
-    - Striving for a high degree of clarity and detail in the documentation
+  - Using shared constructors in the API to guarantee uniformity
+  - Guaranteeing long-term support for all major releases
+  - Striving for a high degree of clarity and detail in the documentation
 - Keeping the library up to date & vulnerability-free
-    - Automatically updating dependencies and testing code
-    - Prioritizing issues & feedback on implementations
+  - Automatically updating dependencies and testing code
+  - Prioritizing issues & feedback on implementations
 
 # Table of Contents
 <!-- TOC -->
 * [libes](#libes)
   * [Why use libes?](#why-use-libes)
 * [Table of Contents](#table-of-contents)
+* [FAQ](#faq)
 * [About](#about)
   * [What is ECIES?](#what-is-ecies)
   * [ECIES Variants](#ecies-variants)
   * [ECIES-MAC Flowchart](#ecies-mac-flowchart)
   * [ECIES-AEAD Flowchart](#ecies-aead-flowchart)
   * [ECIES-SYN Flowchart](#ecies-syn-flowchart)
+  * [SemVer](#semver)
+  * [Release Tracks](#release-tracks)
   * [Conditional Compilation](#conditional-compilation)
 * [Encryption Scheme Support](#encryption-scheme-support)
   * [Support icon legend](#support-icon-legend)
   * [Elliptic Curve Support Matrix](#elliptic-curve-support-matrix)
   * [Encryption Support Matrix](#encryption-support-matrix)
-  * [MAC Support Matrix](#mac-support-matrix)
+  * [Authentication Support Matrix](#authentication-support-matrix)
 * [License](#license)
 * [Contributing](#contributing)
 <!-- TOC -->
+
+# FAQ
+TBD
 
 # About
 ## What is ECIES?
@@ -107,23 +113,42 @@ See the README.md on [GitHub](https://github.com/TJRoh01/libes/blob/main/README.
 ## ECIES-SYN Flowchart
 See the README.md on [GitHub](https://github.com/TJRoh01/libes/blob/main/README.md).
 
+## SemVer
+This library respects SemVer, and guarantees decryption backwards compatibility.
+
+This means that data encrypted using library version X.Y.Z can be decrypted
+using any superseding library version as long as X is the same.
+
+For example, data encrypted using version 0.5.7 can be decrypted using version
+0.5.7 or 0.11.1, but not using versions 1.2.3, 0.5.6, or 0.4.10.
+
+Effort will be made to keep X, the major version, decryption backwards compatible
+as well, but no guarantee is given.
+
+## Release Tracks
+- v0.1.Z: alpha - initial strcuture
+- v0.(2+).Z: beta - adding algorithms
+- v1.0.0-pre.W: pre-production - refactoring & memory zeroing implementation
+- v1.0.0: initial production - potentially backwards-incompatible refactoring
+- V1.(1+).Z: production - wasm support & more
+
 ## Conditional Compilation
 All algorithm combinations are gated behind features, to reduce how much is
 being compiled. Features are named exactly like the algorithm names in the
 support matrices (if there are alternative names like P-521 and secp521r1 then
-they are aliases, so you can enable either). There are also no ECIES methods
-hard-defined, the library relies on a type alias being defined, and then the
-appropriate traits will automatically implement on it,
-exposing high-level functionality.
+they are aliases, so you can enable either). This library uses traits to implement
+appropriate functionality on valid user-defined variants.
 
 **NOTE:** No ECIES variants are available without activating any features,
 at minimum one of each feature categories must be activated:
-- Elliptic Curve Key (e.g. x25519)
+- Elliptic Curve (e.g. x25519)
 - Encryption (e.g. AES-GCM)
-- Variant (e.g. ECIES-AEAD)
+- Authentication (e.g. ECIES-AEAD or HMAC-SHA256)
 
-Additionally, a MAC feature (e.g. HMAC-SHA256) can be activated to enable the
-use of ECIES-MAC.
+**NOTE:** For a ECIES combination to be valid the Elliptic Curve, Encryption,
+and Authentication algorithms must all support the same ECIES variant.
+- To use ECIES-MAC, all three chosen algorithms need a "🚀" in their respective ECIES-MAC columns
+- To use ECIES-AEAD or ECIES-SYN both first two algorithms need a "🚀" in the variant column
 
 # Encryption Scheme Support
 ## Support icon legend
@@ -138,8 +163,9 @@ use of ECIES-MAC.
 |:-----------------:|:---------:|:----------:|:---------:|
 |      x25519       |    🏗️    |    🏗️     |    📅     |
 |      ed25519      |    🏗️    |    🏗️     |    📅     |
+| K-256 / secp256k1 |    🤔     |     🤔     |    🤔     |
 | P-256 / secp256r1 |    🤔     |     🤔     |    🤔     |
-|  P-384 secp384r1  |    🤔     |     🤔     |    🤔     |
+| P-384 / secp384r1 |    🤔     |     🤔     |    🤔     |
 | P-521 / secp521r1 |    🤔     |     🤔     |    🤔     |
 
 ## Encryption Support Matrix
@@ -149,7 +175,7 @@ use of ECIES-MAC.
 | XChaCha20-Poly1305 |    🏗️    |    🏗️     |    📅     |
 |      AES-GCM       |    🤔     |     🤔     |    🤔     |
 
-## MAC Support Matrix
+## Authentication Support Matrix
 |  Algorithm  | ECIES-MAC |
 |:-----------:|:---------:|
 | HMAC-SHA256 |    🏗️    |
@@ -175,4 +201,4 @@ to be able to determine what to do without having to ask too many follow-up ques
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in this project by you, as defined in the Apache-2.0 license,
-shall be dual licensed as above , without any additional terms or conditions.
+shall be dual licensed as above, without any additional terms or conditions.
