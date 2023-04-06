@@ -1,10 +1,9 @@
 # libes
 ![Crates.io](https://img.shields.io/crates/l/libes?style=for-the-badge)
-![GitHub last commit](https://img.shields.io/github/last-commit/TJRoh01/libes?style=for-the-badge)
-![Crates.io](https://img.shields.io/crates/v/libes?style=for-the-badge)
-![docs.rs](https://img.shields.io/docsrs/libes/latest?style=for-the-badge)
-![Libraries.io](https://img.shields.io/librariesio/release/cargo/libes?style=for-the-badge)
-
+[![GitHub last commit](https://img.shields.io/github/last-commit/TJRoh01/libes?style=for-the-badge)](https://github.com/TJRoh01/libes)
+[![Crates.io](https://img.shields.io/crates/v/libes?style=for-the-badge)](https://crates.io/crates/libes)
+[![docs.rs](https://img.shields.io/docsrs/libes/latest?style=for-the-badge)](https://docs.rs/libes/latest/libes)
+[![Libraries.io](https://img.shields.io/librariesio/release/cargo/libes?style=for-the-badge)](https://libraries.io/cargo/libes)
 
 **lib**rary of **e**ncryption **s**cheme(s) is a collection of ECIES variants.  
 The goal of this is library is to become a one-stop shop for everything ECIES.
