@@ -53,8 +53,8 @@ impl<K, E, A> Ecies<K, E, A>
 #[cfg(feature = "ECIES-MAC")]
 impl<K, E, A> Ecies<K, E, A>
 where
-    K: Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
-    E: Encryption + GenNonce + SplitEncKey,
+    K: EciesMacSupport + Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
+    E: EciesMacSupport + Encryption + GenNonce + SplitEncKey,
     A: Mac + SplitMacKey
 {
     pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
@@ -86,8 +86,8 @@ where
 #[cfg(feature = "ECIES-MAC")]
 impl<K, E, A> Ecies<K, E, A>
 where
-    K: Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial + EciesMacSupport,
-    E: Encryption + SplitNonce + SplitEncKey + EciesMacSupport,
+    K: EciesMacSupport + Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
+    E: EciesMacSupport + Encryption + SplitNonce + SplitEncKey,
     A: Mac + SplitMac
 {
     pub fn decrypt<T: IntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
@@ -110,8 +110,8 @@ where
 #[cfg(feature = "ECIES-AEAD")]
 impl<K, E> Ecies<K, E, Aead>
 where
-    K: Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial + EciesAeadSupport,
-    E: Encryption + GenNonce + SplitEncKey + EciesAeadSupport
+    K: EciesAeadSupport + Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
+    E: EciesAeadSupport + Encryption + GenNonce + SplitEncKey
 {
     pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
         // Generate
@@ -139,8 +139,8 @@ where
 #[cfg(feature = "ECIES-AEAD")]
 impl<K, E> Ecies<K, E, Aead>
 where
-    K: Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial + EciesAeadSupport,
-    E: Encryption + SplitNonce + SplitEncKey + EciesAeadSupport
+    K: EciesAeadSupport + Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
+    E: EciesAeadSupport + Encryption + SplitNonce + SplitEncKey
 {
     pub fn decrypt<T: IntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
         let mut ciphertext = ciphertext.to_vec();
@@ -159,8 +159,8 @@ where
 #[cfg(feature = "ECIES-SYN")]
 impl<K, E> Ecies<K, E, Syn>
 where
-    K: Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial + EciesSynSupport,
-    E: Encryption + SplitNonce + SplitEncKey + EciesSynSupport
+    K: EciesSynSupport + Key + GenerateEphemeralKey + KeyExchange + DeriveKeyMaterial,
+    E: EciesSynSupport + Encryption + SplitNonce + SplitEncKey
 {
     pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
         // Generate
@@ -187,8 +187,8 @@ where
 #[cfg(feature = "ECIES-SYN")]
 impl<K, E> Ecies<K, E, Syn>
 where
-    K: Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
-    E: Encryption + SplitNonce + SplitEncKey
+    K: EciesSynSupport + Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
+    E: EciesSynSupport + Encryption + SplitNonce + SplitEncKey
 {
     pub fn decrypt<T: IntoSecretKey<K>>(sk: T, ciphertext: &[u8]) -> Result<Vec<u8>, ()> {
         let mut ciphertext = ciphertext.to_vec();
