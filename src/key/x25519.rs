@@ -22,6 +22,9 @@ impl EciesSynEncryptionSupport for X25519 {}
 #[cfg(feature = "ECIES-SYN")]
 impl EciesSynDecryptionSupport for X25519 {}
 
+/// Marker for using the `x25519` algorithm for elliptic curve operations
+///
+/// x25519 is provided by [x25519-dalek](https://crates.io/crates/x25519-dalek)
 pub struct X25519(x25519_dalek::PublicKey);
 
 impl TryPublicKeyFrom<[u8; 32]> for X25519 {

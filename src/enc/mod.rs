@@ -1,3 +1,5 @@
+//! Markers for Encryption algorithms supported by `libes`
+
 pub(crate) mod generics;
 
 #[cfg(feature = "XChaCha20-Poly1305")]

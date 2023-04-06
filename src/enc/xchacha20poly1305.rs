@@ -23,6 +23,9 @@ impl EciesSynEncryptionSupport for XChaCha20Poly1305 {}
 #[cfg(feature = "ECIES-SYN")]
 impl EciesSynDecryptionSupport for XChaCha20Poly1305 {}
 
+/// Marker for using the `XChaCha20-Poly1305` algorithm for encryption
+///
+/// XChaCha20-Poly1305 is provided by [chacha20poly1305](https://crates.io/crates/chacha20poly1305)
 pub struct XChaCha20Poly1305;
 
 impl Encryption for XChaCha20Poly1305 {
