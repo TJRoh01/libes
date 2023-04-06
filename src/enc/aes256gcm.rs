@@ -1,7 +1,7 @@
 use super::generics::Encryption;
 use crate::EciesError;
-use chacha20poly1305::aead::{Aead, Payload};
-use chacha20poly1305::KeyInit;
+use aes_gcm::aead::{Aead, Payload};
+use aes_gcm::KeyInit;
 
 #[cfg(feature = "ECIES-MAC")]
 use crate::markers::{EciesMacDecryptionSupport, EciesMacEncryptionSupport};
