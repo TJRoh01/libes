@@ -11,6 +11,11 @@ The goal of this is library is to become a one-stop shop for everything ECIES.
 
 For code documentation, usage explanations, and examples please see [Docs.rs](https://docs.rs/libes/latest/libes/).
 
+## ⚠️ Alpha Release Track - Not Production Ready ⚠️
+During alpha development, versions 0.1.Z, there is no guarantee of backwards compatibility and
+the API can change at any time. If you decide to use this library at this time, make sure that
+you always use the latest version, and be prepared to update your usage of the library often.
+
 ## Why use libes?
 The rust cryptography ecosystem is swarming with crates, with varying degrees
 of quality and documentation. I have taken it onto myself to navigate this,
