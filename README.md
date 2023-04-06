@@ -45,7 +45,7 @@ In doing this I commit myself to:
   * [Support icon legend](#support-icon-legend)
   * [Elliptic Curve Support Matrix](#elliptic-curve-support-matrix)
   * [Encryption Support Matrix](#encryption-support-matrix)
-  * [MAC Support Matrix](#mac-support-matrix)
+  * [Authentication Support Matrix](#authentication-support-matrix)
 * [License](#license)
 * [Contributing](#contributing)
 <!-- TOC -->
@@ -108,7 +108,7 @@ I will make sure that it receives a security audit.
 Flowchart color coding:
 - Red: Encryption
 - Green: Elliptic Curve
-- Blue: MAC
+- Blue: Authentication
 ```mermaid
 graph TB
     subgraph Input
@@ -153,14 +153,16 @@ graph TB
     MSG --> ENC_FN
     ENC_FN --> MAC_FN & ENC_OUT
     MAC_FN --> MAC_OUT
+    EK_PUB --> |Encapsulation| DER_FN
     
     %% Elliptic Curve Key link colorization
     linkStyle 2 stroke:#98fb98,stroke-width:2px;
     linkStyle 3 stroke:#98fb98,stroke-width:2px;
     linkStyle 8 stroke:#98fb98,stroke-width:2px;
     linkStyle 9 stroke:#98fb98,stroke-width:2px;
+    linkStyle 18 stroke:#98fb98,stroke-width:2px;
     
-    %% MAC link colorization
+    %% Authentication link colorization
     linkStyle 4 stroke:#0096ff,stroke-width:2px;
     linkStyle 6 stroke:#0096ff,stroke-width:2px;
     linkStyle 11 stroke:#0096ff,stroke-width:2px;
@@ -220,12 +222,14 @@ graph TB
     MSG --> ENC_FN
     ENC_FN --> ENC_OUT
     IV --> ENC_FN & IV_OUT
+    EK_PUB --> |Encapsulation| DER_FN
     
     %% Elliptic Curve Key link colorization
     linkStyle 2 stroke:#98fb98,stroke-width:2px;
     linkStyle 3 stroke:#98fb98,stroke-width:2px;
     linkStyle 4 stroke:#98fb98,stroke-width:2px;
     linkStyle 5 stroke:#98fb98,stroke-width:2px;
+    linkStyle 12 stroke:#98fb98,stroke-width:2px;
     
     %% Nonce link colorization
     linkStyle 10 stroke:#0096ff,stroke-width:2px;
@@ -281,12 +285,14 @@ graph TB
     DER_ENC_KEY --> ENC_FN
     MSG --> ENC_FN
     ENC_FN --> ENC_OUT
+    EK_PUB --> |Encapsulation| DER_FN
     
     %% Elliptic Curve Key link colorization
     linkStyle 1 stroke:#98fb98,stroke-width:2px;
     linkStyle 2 stroke:#98fb98,stroke-width:2px;
     linkStyle 3 stroke:#98fb98,stroke-width:2px;
     linkStyle 4 stroke:#98fb98,stroke-width:2px;
+    linkStyle 11 stroke:#98fb98,stroke-width:2px;
     
     %% Nonce link colorization
     linkStyle 5 stroke:#0096ff,stroke-width:2px;
@@ -322,16 +328,19 @@ as well, but no guarantee is given.
 All algorithm combinations are gated behind features, to reduce how much is
 being compiled. Features are named exactly like the algorithm names in the
 support matrices (if there are alternative names like P-521 and secp521r1 then
-they are aliases, so you can enable either). There are also no ECIES methods
-hard-defined, the library relies on a type alias being defined, and then the 
-appropriate traits will automatically implement on it,
-exposing high-level functionality.
+they are aliases, so you can enable either). This library uses traits to implement
+appropriate functionality on valid user-defined variants.
 
 **NOTE:** No ECIES variants are available without activating any features,
 at minimum one of each feature categories must be activated:
 - Elliptic Curve (e.g. x25519)
 - Encryption (e.g. AES-GCM)
 - Authentication (e.g. ECIES-AEAD or HMAC-SHA256)
+
+**NOTE:** For a ECIES combination to be valid the Elliptic Curve, Encryption,
+and Authentication algorithms must all support the same ECIES variant.
+- To use ECIES-MAC, all three chosen algorithms need a "🚀" in their respective ECIES-MAC columns
+- To use ECIES-AEAD or ECIES-SYN both first two algorithms need a "🚀" in the variant column
 
 # Encryption Scheme Support
 ## Support icon legend
@@ -346,8 +355,9 @@ at minimum one of each feature categories must be activated:
 |:-----------------:|:---------:|:----------:|:---------:|
 |      x25519       |    🏗️    |    🏗️     |    📅     |
 |      ed25519      |    🏗️    |    🏗️     |    📅     |
+| K-256 / secp256k1 |    🤔     |     🤔     |    🤔     |
 | P-256 / secp256r1 |    🤔     |     🤔     |    🤔     |
-|  P-384 secp384r1  |    🤔     |     🤔     |    🤔     |
+| P-384 / secp384r1 |    🤔     |     🤔     |    🤔     |
 | P-521 / secp521r1 |    🤔     |     🤔     |    🤔     |
 
 ## Encryption Support Matrix
