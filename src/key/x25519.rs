@@ -1,4 +1,5 @@
-use super::generics::{GenerateEphemeralKey, Key, KeyExchange, TryPublicKeyFrom, TrySecretKeyFrom};
+use super::conversion::{PublicKeyFrom, SecretKeyFrom, TryPublicKeyFrom, TrySecretKeyFrom};
+use super::generics::{GenerateEphemeralKey, Key, KeyExchange};
 use rand_core::OsRng;
 
 #[cfg(feature = "ECIES-MAC")]
@@ -27,55 +28,55 @@ impl EciesSynDecryptionSupport for X25519 {}
 /// x25519 is provided by [x25519-dalek](https://crates.io/crates/x25519-dalek)
 pub struct X25519(x25519_dalek::PublicKey);
 
-impl TryPublicKeyFrom<[u8; 32]> for X25519 {
-    fn try_pk_from(x: [u8; 32]) -> Result<Self, ()> {
-        Ok(Self(x25519_dalek::PublicKey::from(x)))
+impl PublicKeyFrom<x25519_dalek::PublicKey> for X25519 {
+    fn pk_from(x: x25519_dalek::PublicKey) -> Self {
+        Self(x)
+    }
+}
+
+impl PublicKeyFrom<[u8; 32]> for X25519 {
+    fn pk_from(x: [u8; 32]) -> Self {
+        Self(x25519_dalek::PublicKey::from(x))
     }
 }
 
 impl TryPublicKeyFrom<&[u8]> for X25519 {
     fn try_pk_from(x: &[u8]) -> Result<Self, ()> {
         let bytes: [u8; 32] = x.try_into().map_err(|_| ())?;
-        X25519::try_pk_from(bytes)
+        Ok(Self::pk_from(bytes))
     }
 }
 
 impl TryPublicKeyFrom<Vec<u8>> for X25519 {
     fn try_pk_from(x: Vec<u8>) -> Result<Self, ()> {
         let bytes: [u8; 32] = x.try_into().map_err(|_| ())?;
-        X25519::try_pk_from(bytes)
+        Ok(Self::pk_from(bytes))
     }
 }
 
-impl TryPublicKeyFrom<x25519_dalek::PublicKey> for X25519 {
-    fn try_pk_from(x: x25519_dalek::PublicKey) -> Result<Self, ()> {
-        Ok(Self(x))
+impl SecretKeyFrom<x25519_dalek::StaticSecret> for X25519 {
+    fn sk_from(x: x25519_dalek::StaticSecret) -> Self::SecretKey {
+        x
     }
 }
 
-impl TrySecretKeyFrom<[u8; 32]> for X25519 {
-    fn try_sk_from(x: [u8; 32]) -> Result<Self::SecretKey, ()> {
-        Ok(x25519_dalek::StaticSecret::from(x))
+impl SecretKeyFrom<[u8; 32]> for X25519 {
+    fn sk_from(x: [u8; 32]) -> Self::SecretKey {
+        x25519_dalek::StaticSecret::from(x)
     }
 }
 
 impl TrySecretKeyFrom<&[u8]> for X25519 {
     fn try_sk_from(x: &[u8]) -> Result<Self::SecretKey, ()> {
         let bytes: [u8; 32] = x.try_into().map_err(|_| ())?;
-        X25519::try_sk_from(bytes)
+        Ok(Self::sk_from(bytes))
     }
 }
 
 impl TrySecretKeyFrom<Vec<u8>> for X25519 {
     fn try_sk_from(x: Vec<u8>) -> Result<Self::SecretKey, ()> {
         let bytes: [u8; 32] = x.try_into().map_err(|_| ())?;
-        X25519::try_sk_from(bytes)
-    }
-}
-
-impl TrySecretKeyFrom<x25519_dalek::StaticSecret> for X25519 {
-    fn try_sk_from(x: x25519_dalek::StaticSecret) -> Result<Self::SecretKey, ()> {
-        Ok(x)
+        Ok(Self::sk_from(bytes))
     }
 }
 
