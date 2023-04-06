@@ -13,7 +13,7 @@ impl Mac for HmacSha256 {
     const MAC_LEN: usize = 32;
 
     fn digest(key: &[u8], nonce: &[u8], ciphertext: &[u8]) -> Result<Vec<u8>, Error> {
-        let mut mac = Hmac::<Sha256>::new_from_slice(key).map_err(|_| Error)?;
+        let mut mac = Hmac::<Sha256>::new_from_slice(key).map_err(|_| Error::BadData)?;
 
         mac.update(nonce);
         mac.update(ciphertext);
@@ -22,11 +22,11 @@ impl Mac for HmacSha256 {
     }
 
     fn verify(key: &[u8], nonce: &[u8], ciphertext: &[u8], tag: &[u8]) -> Result<(), Error> {
-        let mut mac = Hmac::<Sha256>::new_from_slice(key).map_err(|_| Error)?;
+        let mut mac = Hmac::<Sha256>::new_from_slice(key).map_err(|_| Error::BadData)?;
 
         mac.update(nonce);
         mac.update(ciphertext);
 
-        mac.verify_slice(tag).map_err(|_| Error)
+        mac.verify_slice(tag).map_err(|_| Error::BadAuthenticationTag)
     }
 }

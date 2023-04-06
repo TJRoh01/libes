@@ -25,7 +25,7 @@ impl<E: Encryption> SplitNonce for E {}
 pub trait SplitNonce: Encryption {
     fn get_nonce(x: &mut Vec<u8>) -> Result<Vec<u8>, Error> {
         if x.len() < Self::ENC_NONCE_LEN {
-            return Err(Error)
+            return Err(Error::BadData)
         }
 
         Ok(x.drain(..Self::ENC_NONCE_LEN).collect())
@@ -37,7 +37,7 @@ impl<E: Encryption> SplitEncKey for E {}
 pub trait SplitEncKey: Encryption {
     fn get_enc_key(x: &mut Vec<u8>) -> Result<Vec<u8>, Error> {
         if x.len() < Self::ENC_KEY_LEN {
-            return Err(Error)
+            return Err(Error::BadData)
         }
 
         Ok(x.drain(..Self::ENC_KEY_LEN).collect())

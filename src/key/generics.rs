@@ -19,10 +19,10 @@ impl<K: TryPublicKeyFrom<Vec<u8>> + Key> SplitEphemeralKey for K {}
 pub trait SplitEphemeralKey: TryPublicKeyFrom<Vec<u8>> + Key + Sized {
     fn get_ephemeral_key(x: &mut Vec<u8>) -> Result<Self, Error> {
         if x.len() < Self::EC_KEY_LEN {
-            return Err(Error)
+            return Err(Error::BadData)
         }
 
-        Self::try_pk_from(x.drain(..Self::EC_KEY_LEN).collect::<Vec<u8>>()).map_err(|_| Error)
+        Self::try_pk_from(x.drain(..Self::EC_KEY_LEN).collect::<Vec<u8>>()).map_err(|_| Error::BadData)
     }
 }
 
