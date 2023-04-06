@@ -1,4 +1,5 @@
 use super::generics::Key;
+use crate::KeyError;
 
 /// A value -> `PublicKey` conversion that consumes the input value. The opposite of [IntoPublicKey].
 pub trait PublicKeyFrom<T>: Key + Sized {
@@ -27,19 +28,19 @@ where
 
 /// Attempt a value -> `PublicKey` conversion that consumes the input value. The opposite of [TryIntoPublicKey].
 pub trait TryPublicKeyFrom<T>: Key + Sized {
-    fn try_pk_from(x: T) -> Result<Self, ()>;
+    fn try_pk_from(x: T) -> Result<Self, KeyError>;
 }
 
 /// Attempt a value -> `PublicKey` conversion that consumes the input value. The opposite of [TryPublicKeyFrom].
 pub trait TryIntoPublicKey<U: Key> {
-    fn try_into_pk(self) -> Result<U, ()>;
+    fn try_into_pk(self) -> Result<U, KeyError>;
 }
 
 impl<T, U> TryIntoPublicKey<U> for T
 where
     U: TryPublicKeyFrom<T>,
 {
-    fn try_into_pk(self) -> Result<U, ()> {
+    fn try_into_pk(self) -> Result<U, KeyError> {
         U::try_pk_from(self)
     }
 }
@@ -65,19 +66,19 @@ where
 
 /// Attempt a value -> `SecretKey` conversion that consumes the input value. The opposite of [TryIntoSecretKey].
 pub trait TrySecretKeyFrom<T>: Key {
-    fn try_sk_from(x: T) -> Result<Self::SecretKey, ()>;
+    fn try_sk_from(x: T) -> Result<Self::SecretKey, KeyError>;
 }
 
 /// Attempt a value -> `SecretKey` conversion that consumes the input value. The opposite of [TrySecretKeyFrom].
 pub trait TryIntoSecretKey<U: Key> {
-    fn try_into_sk(self) -> Result<U::SecretKey, ()>;
+    fn try_into_sk(self) -> Result<U::SecretKey, KeyError>;
 }
 
 impl<T, U> TryIntoSecretKey<U> for T
 where
     U: TrySecretKeyFrom<T>,
 {
-    fn try_into_sk(self) -> Result<U::SecretKey, ()> {
+    fn try_into_sk(self) -> Result<U::SecretKey, KeyError> {
         U::try_sk_from(self)
     }
 }

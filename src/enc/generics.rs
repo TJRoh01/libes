@@ -1,11 +1,12 @@
+use crate::EciesError;
 use rand_core::{OsRng, RngCore};
 
 pub trait Encryption {
     const ENC_KEY_LEN: usize;
     const ENC_NONCE_LEN: usize;
 
-    fn encrypt(key: &[u8], nonce: &[u8], plaintext: &[u8]) -> Vec<u8>;
-    fn decrypt(key: &[u8], nonce: &[u8], ciphertext: &[u8]) -> Result<Vec<u8>, ()>;
+    fn encrypt(key: &[u8], nonce: &[u8], plaintext: &[u8]) -> Result<Vec<u8>, EciesError>;
+    fn decrypt(key: &[u8], nonce: &[u8], ciphertext: &[u8]) -> Result<Vec<u8>, EciesError>;
 }
 
 impl<E: Encryption> GenNonce for E {}
@@ -22,15 +23,23 @@ pub trait GenNonce: Encryption {
 impl<E: Encryption> SplitNonce for E {}
 
 pub trait SplitNonce: Encryption {
-    fn get_nonce(x: &mut Vec<u8>) -> Vec<u8> {
-        x.drain(..Self::ENC_NONCE_LEN).collect()
+    fn get_nonce(x: &mut Vec<u8>) -> Result<Vec<u8>, EciesError> {
+        if x.len() < Self::ENC_NONCE_LEN {
+            return Err(EciesError::BadData);
+        }
+
+        Ok(x.drain(..Self::ENC_NONCE_LEN).collect())
     }
 }
 
 impl<E: Encryption> SplitEncKey for E {}
 
 pub trait SplitEncKey: Encryption {
-    fn get_enc_key(x: &mut Vec<u8>) -> Vec<u8> {
-        x.drain(..Self::ENC_KEY_LEN).collect()
+    fn get_enc_key(x: &mut Vec<u8>) -> Result<Vec<u8>, EciesError> {
+        if x.len() < Self::ENC_KEY_LEN {
+            return Err(EciesError::BadData);
+        }
+
+        Ok(x.drain(..Self::ENC_KEY_LEN).collect())
     }
 }
