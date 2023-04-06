@@ -1,0 +1,33 @@
+[package]
+name = "libes"
+version = "0.1.0"
+authors = ["Tomas Rohatynski"]
+edition = "2021"
+description = "Collection of Elliptic Curve Integrated Encryption Scheme(s)"
+readme = "README.md"
+homepage = "https://gitlab.com/TJRoh01/libes"
+repository = "https://gitlab.com/TJRoh01/libes"
+license = "MIT OR Apache-2.0"
+keywords = ["library", "encryption", "cypto", "ecc", "ecies"]
+categories = ["cryptography", "data-structures", "encoding", "algorithms"]
+
+features = [
+    # Elliptic Curve Key
+    "x25519",
+    "ed25519",
+    # Encryption
+    "XChaCha20Poly1305",
+    # Mode
+    "compact"
+]
+
+[lib]
+name = "libes"
+path = "src/lib.rs"
+test = true
+doctest = true
+bench = false
+doc = true
+
+
+[dependencies]
