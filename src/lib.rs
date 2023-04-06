@@ -239,7 +239,7 @@
 //! ### Encryption Support Matrix
 //! | Algorithm/ECIES Variant | ECIES-MAC | ECIES-AEAD | ECIES-SYN |
 //! |:-----------------------:|:---------:|:----------:|:---------:|
-//! |    ChaCha20-Poly1305    |    📅     |     📅     |    📅     |
+//! |    ChaCha20-Poly1305    |    🚀     |     🚀     |    🚀     |
 //! |   XChaCha20-Poly1305    |    🚀     |     🚀     |    🚀     |
 //! |       AES128-GCM        |  🚫[^1]   |   🚫[^1]   |  🚫[^1]   |
 //! |       AES256-GCM        |    🚀     |     🚀     |    🚀     |
