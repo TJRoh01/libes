@@ -149,11 +149,12 @@ use auth::Syn;
 use enc::generics::GenNonce;
 
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
-use key::{TryIntoPublicKey, TryIntoSecretKey, generics::{DeriveKeyMaterial, GenerateEphemeralKey, Key, KeyExchange, SplitEphemeralKey}};
+use key::generics::{TryIntoSecretKey, DeriveKeyMaterial, GenerateEphemeralKey, KeyExchange, SplitEphemeralKey};
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
 use enc::generics::{Encryption, SplitEncKey, SplitNonce};
 
 use std::marker::PhantomData;
+use key::generics::{TryIntoPublicKey, Key};
 
 /// Generic `ECIES` instance
 pub struct Ecies<K, E, A> {

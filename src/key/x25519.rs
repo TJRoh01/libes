@@ -1,5 +1,5 @@
 use rand_core::OsRng;
-use super::{TryPublicKeyFrom, TrySecretKeyFrom, generics::{Key, GenerateEphemeralKey, KeyExchange}};
+use super::generics::{TryPublicKeyFrom, TrySecretKeyFrom, Key, GenerateEphemeralKey, KeyExchange};
 
 #[cfg(feature = "ECIES-MAC")]
 use crate::markers::{EciesMacEncryptionSupport, EciesMacDecryptionSupport};
