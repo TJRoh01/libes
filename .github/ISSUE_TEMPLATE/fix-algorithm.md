@@ -13,7 +13,7 @@ e.g. x25519 & x25519-dalek
 
 **What (and why) needs to be changed?**
 _Free text_
-e.g. The dependency has implemented X incorrectly, and that makes it unsafe to use. Their implementation has omitted operation Y.
+e.g. The dependency x25519-dalek has implemented X incorrectly, and that makes it unsafe to use. Their implementation has omitted operation Y.
 
 **What needs to be done to resolve this?**
 _Free text_

@@ -1,6 +1,6 @@
 ---
 name: Add algorithm
-about: Suggest adding an algorithm implementation & dependency
+about: Suggest adding support for an algorithm & dependency
 title: "[ADD] ALGORITHM NAME"
 labels: add algorithm
 assignees: ''
