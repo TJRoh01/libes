@@ -95,7 +95,7 @@ impl Key for X25519 {
 
 impl GenerateEphemeralKey for X25519 {
     fn get_ephemeral_key() -> (Self, Self::SecretKey) {
-        let sk = x25519_dalek::StaticSecret::new(OsRng);
+        let sk = x25519_dalek::StaticSecret::random_from_rng(OsRng);
         (Self(x25519_dalek::PublicKey::from(&sk)), sk)
     }
 }
