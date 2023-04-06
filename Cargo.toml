@@ -3,6 +3,7 @@ name = "libes"
 version = "0.1.2"
 authors = ["Tomas Rohatynski"]
 edition = "2021"
+rust-version = "1.60"
 description = "Collection of Elliptic Curve Integrated Encryption Scheme(s)"
 readme = "README_CRATES_IO.md"
 homepage = "https://gitlab.com/TJRoh01/libes"
