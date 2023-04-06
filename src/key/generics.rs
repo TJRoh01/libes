@@ -1,14 +1,14 @@
-use super::conversion::TryPublicKeyFrom;
 use crate::EciesError;
 use hkdf::Hkdf;
 use sha2::Sha256;
 
 // Elliptic curve key implementation
 pub trait Key {
-    const EC_KEY_LEN: usize;
+    const EC_PUBLIC_KEY_LEN: usize;
     type SecretKey;
 
     fn as_bytes(&self) -> &[u8];
+    fn from_bytes(x: &[u8]) -> Self;
 }
 
 // ECDH key exchange implementation
@@ -21,17 +21,18 @@ pub trait GenerateEphemeralKey: Key + Sized {
     fn get_ephemeral_key() -> (Self, Self::SecretKey);
 }
 
-impl<K: TryPublicKeyFrom<Vec<u8>> + Key> TakeEphemeralKey for K {}
+impl<K: Key> TakeEphemeralKey for K {}
 
 // Provide public ephemeral key by taking it from the front of some data
-pub trait TakeEphemeralKey: TryPublicKeyFrom<Vec<u8>> + Key + Sized {
+pub trait TakeEphemeralKey: Key + Sized {
     fn get_ephemeral_key(x: &mut Vec<u8>) -> Result<Self, EciesError> {
-        if x.len() < Self::EC_KEY_LEN {
+        if x.len() < Self::EC_PUBLIC_KEY_LEN {
             return Err(EciesError::BadData);
         }
 
-        Self::try_pk_from(x.drain(..Self::EC_KEY_LEN).collect::<Vec<u8>>())
-            .map_err(|_| EciesError::BadData)
+        Ok(Self::from_bytes(
+            &x.drain(..Self::EC_PUBLIC_KEY_LEN).collect::<Vec<u8>>(),
+        ))
     }
 }
 

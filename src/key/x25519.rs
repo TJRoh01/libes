@@ -50,8 +50,7 @@ impl TryPublicKeyFrom<&[u8]> for X25519 {
 
 impl TryPublicKeyFrom<Vec<u8>> for X25519 {
     fn try_pk_from(x: Vec<u8>) -> Result<Self, KeyError> {
-        let bytes: [u8; 32] = x.try_into().map_err(|_| KeyError::BadData)?;
-        Ok(Self::pk_from(bytes))
+        Self::try_pk_from(x.as_slice())
     }
 }
 
@@ -76,17 +75,21 @@ impl TrySecretKeyFrom<&[u8]> for X25519 {
 
 impl TrySecretKeyFrom<Vec<u8>> for X25519 {
     fn try_sk_from(x: Vec<u8>) -> Result<Self::SecretKey, KeyError> {
-        let bytes: [u8; 32] = x.try_into().map_err(|_| KeyError::BadData)?;
-        Ok(Self::sk_from(bytes))
+        Self::try_sk_from(x.as_slice())
     }
 }
 
 impl Key for X25519 {
-    const EC_KEY_LEN: usize = 32;
+    const EC_PUBLIC_KEY_LEN: usize = 32;
     type SecretKey = x25519_dalek::StaticSecret;
 
     fn as_bytes(&self) -> &[u8] {
         self.0.as_bytes()
+    }
+
+    fn from_bytes(x: &[u8]) -> Self {
+        let fixed_arr: [u8; 32] = x.try_into().expect("invalid length");
+        Self(x25519_dalek::PublicKey::from(fixed_arr))
     }
 }
 
