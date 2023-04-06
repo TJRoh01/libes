@@ -1,6 +1,6 @@
 use chacha20poly1305::KeyInit;
 use chacha20poly1305::aead::{Aead, Payload};
-use super::{Encryption, SynCompatible};
+use super::generics::{Encryption, SynCompatible};
 
 pub struct XChaCha20Poly1305;
 

@@ -1,6 +1,6 @@
 use rand_core::OsRng;
-use crate::key::Key;
-use super::{GenerateEphemeralKey, KeyExchange};
+use super::generics::Key;
+use super::generics::{GenerateEphemeralKey, KeyExchange};
 
 pub struct X25519(x25519_dalek::PublicKey);
 
