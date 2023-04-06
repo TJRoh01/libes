@@ -1,13 +1,11 @@
 use rand_core::{OsRng, RngCore};
 
-pub trait SynCompatible {}
-
 pub trait Encryption {
     const ENC_KEY_LEN: usize;
     const ENC_NONCE_LEN: usize;
 
     fn encrypt(key: &[u8], nonce: &[u8], plaintext: &[u8]) -> Vec<u8>;
-    fn decrypt(key: &[u8], nonce: &[u8], ciphertext: &[u8]) -> Vec<u8>;
+    fn decrypt(key: &[u8], nonce: &[u8], ciphertext: &[u8]) -> Result<Vec<u8>, ()>;
 }
 
 impl<E: Encryption> GenNonce for E {}

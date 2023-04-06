@@ -16,16 +16,12 @@ impl Mac for HmacSha256 {
         mac.finalize().into_bytes().as_slice().to_vec()
     }
 
-    fn verify(key: &[u8], nonce: &[u8], ciphertext: &[u8], tag: &[u8]) -> bool {
+    fn verify(key: &[u8], nonce: &[u8], ciphertext: &[u8], tag: &[u8]) -> Result<(), ()> {
         let mut mac = Hmac::<Sha256>::new_from_slice(key).unwrap();
 
         mac.update(nonce);
         mac.update(ciphertext);
 
-        if let Ok(()) = mac.verify_slice(tag) {
-            true
-        } else {
-            false
-        }
+        mac.verify_slice(tag).map_err(|_| ())
     }
 }

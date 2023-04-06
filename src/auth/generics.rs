@@ -3,7 +3,7 @@ pub trait Mac {
     const MAC_LEN: usize;
 
     fn digest(key: &[u8], nonce: &[u8], ciphertext: &[u8]) -> Vec<u8>;
-    fn verify(key: &[u8], nonce: &[u8], ciphertext: &[u8], tag: &[u8]) -> bool;
+    fn verify(key: &[u8], nonce: &[u8], ciphertext: &[u8], tag: &[u8]) -> Result<(), ()>;
 }
 
 impl<M: Mac> SplitMacKey for M {}
