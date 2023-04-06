@@ -180,6 +180,7 @@ impl<K: Key, E, A> Ecies<K, E, A> {
     }
 }
 
+#[cfg_attr(doc_cfg, doc(cfg(feature = "ECIES-MAC")))]
 #[cfg(feature = "ECIES-MAC")]
 impl<K, E, A> Ecies<K, E, A>
 where
@@ -218,6 +219,7 @@ where
     }
 }
 
+#[cfg_attr(doc_cfg, doc(cfg(feature = "ECIES-MAC")))]
 #[cfg(feature = "ECIES-MAC")]
 impl<K, E, A> Ecies<K, E, A>
 where
@@ -251,6 +253,7 @@ where
     }
 }
 
+#[cfg_attr(doc_cfg, doc(cfg(feature = "ECIES-AEAD")))]
 #[cfg(feature = "ECIES-AEAD")]
 impl<K, E> Ecies<K, E, Aead>
 where
@@ -281,6 +284,7 @@ where
     }
 }
 
+#[cfg_attr(doc_cfg, doc(cfg(feature = "ECIES-AEAD")))]
 #[cfg(feature = "ECIES-AEAD")]
 impl<K, E> Ecies<K, E, Aead>
 where
@@ -306,6 +310,7 @@ where
     }
 }
 
+#[cfg_attr(doc_cfg, doc(cfg(feature = "ECIES-SYN")))]
 #[cfg(feature = "ECIES-SYN")]
 impl<K, E> Ecies<K, E, Syn>
 where
@@ -339,6 +344,7 @@ where
     }
 }
 
+#[cfg_attr(doc_cfg, doc(cfg(feature = "ECIES-SYN")))]
 #[cfg(feature = "ECIES-SYN")]
 impl<K, E> Ecies<K, E, Syn>
 where
