@@ -1,22 +1,22 @@
+use super::generics::{GenerateEphemeralKey, Key, KeyExchange, TryPublicKeyFrom, TrySecretKeyFrom};
 use rand_core::OsRng;
-use super::generics::{TryPublicKeyFrom, TrySecretKeyFrom, Key, GenerateEphemeralKey, KeyExchange};
 
 #[cfg(feature = "ECIES-MAC")]
-use crate::markers::{EciesMacEncryptionSupport, EciesMacDecryptionSupport};
+use crate::markers::{EciesMacDecryptionSupport, EciesMacEncryptionSupport};
 #[cfg(feature = "ECIES-MAC")]
 impl EciesMacEncryptionSupport for X25519 {}
 #[cfg(feature = "ECIES-MAC")]
 impl EciesMacDecryptionSupport for X25519 {}
 
 #[cfg(feature = "ECIES-AEAD")]
-use crate::markers::{EciesAeadEncryptionSupport, EciesAeadDecryptionSupport};
+use crate::markers::{EciesAeadDecryptionSupport, EciesAeadEncryptionSupport};
 #[cfg(feature = "ECIES-AEAD")]
 impl EciesAeadEncryptionSupport for X25519 {}
 #[cfg(feature = "ECIES-AEAD")]
 impl EciesAeadDecryptionSupport for X25519 {}
 
 #[cfg(feature = "ECIES-SYN")]
-use crate::markers::{EciesSynEncryptionSupport, EciesSynDecryptionSupport};
+use crate::markers::{EciesSynDecryptionSupport, EciesSynEncryptionSupport};
 #[cfg(feature = "ECIES-SYN")]
 impl EciesSynEncryptionSupport for X25519 {}
 #[cfg(feature = "ECIES-SYN")]
@@ -48,7 +48,9 @@ impl TryPublicKeyFrom<Vec<u8>> for X25519 {
 }
 
 impl TryPublicKeyFrom<x25519_dalek::PublicKey> for X25519 {
-    fn try_pk_from(x: x25519_dalek::PublicKey) -> Result<Self, ()> { Ok(Self(x)) }
+    fn try_pk_from(x: x25519_dalek::PublicKey) -> Result<Self, ()> {
+        Ok(Self(x))
+    }
 }
 
 impl TrySecretKeyFrom<[u8; 32]> for X25519 {
@@ -72,7 +74,9 @@ impl TrySecretKeyFrom<Vec<u8>> for X25519 {
 }
 
 impl TrySecretKeyFrom<x25519_dalek::StaticSecret> for X25519 {
-    fn try_sk_from(x: x25519_dalek::StaticSecret) -> Result<Self::SecretKey, ()> { Ok(x) }
+    fn try_sk_from(x: x25519_dalek::StaticSecret) -> Result<Self::SecretKey, ()> {
+        Ok(x)
+    }
 }
 
 impl Key for X25519 {

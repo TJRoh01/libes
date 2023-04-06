@@ -1,9 +1,9 @@
 use rand_core::OsRng;
 
-use libes::Ecies;
-use libes::key::X25519;
+use libes::auth::{Aead, HmacSha256, Syn};
 use libes::enc::XChaCha20Poly1305;
-use libes::auth::{Aead, Syn, HmacSha256};
+use libes::key::X25519;
+use libes::Ecies;
 
 const LOREM_IPSUM: &'static [u8] = include_bytes!("lorem_ipsum.txt");
 

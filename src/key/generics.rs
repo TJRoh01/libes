@@ -12,8 +12,8 @@ pub trait TryIntoPublicKey<U: Key> {
 }
 
 impl<T, U> TryIntoPublicKey<U> for T
-    where
-        U: TryPublicKeyFrom<T>
+where
+    U: TryPublicKeyFrom<T>,
 {
     fn try_into_pk(self) -> Result<U, ()> {
         U::try_pk_from(self)
@@ -31,8 +31,8 @@ pub trait TryIntoSecretKey<U: Key> {
 }
 
 impl<T, U> TryIntoSecretKey<U> for T
-    where
-        U: TrySecretKeyFrom<T>
+where
+    U: TrySecretKeyFrom<T>,
 {
     fn try_into_sk(self) -> Result<U::SecretKey, ()> {
         U::try_sk_from(self)
@@ -73,7 +73,9 @@ pub trait DeriveKeyMaterial: Key {
         let hkdf = Hkdf::<Sha256>::new(None, shared_secret.as_slice());
         let mut out = vec![0u8; len];
 
-        hkdf.expand(b"", &mut out).expect("Could not derive enough Key Material");
+        hkdf.expand(b"", &mut out)
+            .expect("Could not derive enough Key Material");
+
         out.to_vec()
     }
 }
