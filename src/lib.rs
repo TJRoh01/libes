@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 use crate::auth::{Aead, Syn, generics::{Mac, SplitMac, SplitMacKey}};
 use crate::enc::generics::{Encryption, GenNonce, SplitEncKey, SplitNonce};
-use crate::key::generics::{DeriveKeyMaterial, GenerateEphemeralKey, Key, KeyExchange, SplitEphemeralKey};
+use crate::key::generics::{DeriveKeyMaterial, GenerateEphemeralKey, GenericSecretKey, Key, KeyExchange, SplitEphemeralKey};
 
 pub mod key;
 pub mod enc;
@@ -58,7 +58,7 @@ impl<K, E, A> Ecies<K, E, A>
         E: Encryption + SplitNonce + SplitEncKey,
         A: Mac + SplitMac
 {
-    pub fn decrypt<T: Into<K::SecretKey>>(sk: T, mut ciphertext: Vec<u8>) -> Vec<u8> {
+    pub fn decrypt<T: Into<GenericSecretKey<K::SecretKey>>>(sk: T, mut ciphertext: Vec<u8>) -> Vec<u8> {
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
         let nonce = E::get_nonce(&mut ciphertext);
         let mac = A::get_mac(&mut ciphertext);
@@ -103,7 +103,7 @@ impl<K, E> Ecies<K, E, Aead>
         K: Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
         E: Encryption + SplitNonce + SplitEncKey
 {
-    pub fn decrypt<T: Into<K::SecretKey>>(sk: T, mut ciphertext: Vec<u8>) -> Vec<u8> {
+    pub fn decrypt<T: Into<GenericSecretKey<K::SecretKey>>>(sk: T, mut ciphertext: Vec<u8>) -> Vec<u8> {
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
         let nonce = E::get_nonce(&mut ciphertext);
 
@@ -141,7 +141,7 @@ impl<K, E> Ecies<K, E, Syn>
         K: Key + SplitEphemeralKey + KeyExchange + DeriveKeyMaterial,
         E: Encryption + SplitNonce + SplitEncKey
 {
-    pub fn decrypt<T: Into<K::SecretKey>>(sk: T, mut ciphertext: Vec<u8>) -> Vec<u8> {
+    pub fn decrypt<T: Into<GenericSecretKey<K::SecretKey>>>(sk: T, mut ciphertext: Vec<u8>) -> Vec<u8> {
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
 
         let shared_secret = K::key_exchange(&ephemeral_pk, sk.into());
