@@ -1,6 +1,7 @@
 use super::conversion::TryPublicKeyFrom;
 use hkdf::Hkdf;
 use sha2::Sha256;
+use crate::Error;
 
 pub trait Key {
     const EC_KEY_LEN: usize;
@@ -16,8 +17,12 @@ pub trait GenerateEphemeralKey: Key + Sized {
 impl<K: TryPublicKeyFrom<Vec<u8>> + Key> SplitEphemeralKey for K {}
 
 pub trait SplitEphemeralKey: TryPublicKeyFrom<Vec<u8>> + Key + Sized {
-    fn get_ephemeral_key(x: &mut Vec<u8>) -> Self {
-        Self::try_pk_from(x.drain(..Self::EC_KEY_LEN).collect::<Vec<u8>>()).unwrap()
+    fn get_ephemeral_key(x: &mut Vec<u8>) -> Result<Self, Error> {
+        if x.len() < Self::EC_KEY_LEN {
+            return Err(Error)
+        }
+
+        Self::try_pk_from(x.drain(..Self::EC_KEY_LEN).collect::<Vec<u8>>()).map_err(|_| Error)
     }
 }
 

@@ -61,8 +61,8 @@
 //! ## Code example
 //! ### Receiver
 //! ```rust
-//! # fn main() -> Result<(), ()> {
-//! # use libes::{auth, Ecies, enc, key};
+//! # use libes::{Error, auth, Ecies, enc, key};
+//! # fn main() -> Result<(), Error> {
 //! // Create an alias for Ecies with our chosen algorithms
 //! type MyEcies = Ecies<key::X25519, enc::XChaCha20Poly1305, auth::Aead>;
 //!
@@ -80,7 +80,7 @@
 //! #
 //! # // Encrypt the message
 //! # let message = b"Hello Alice, this is Bob.";
-//! # let encrypted_message = encryptor.encrypt(message);
+//! # let encrypted_message = encryptor.encrypt(message)?;
 //! #
 //! # // Send encrypted_message to the message recipient
 //! #
@@ -97,8 +97,8 @@
 //!
 //! ### Sender
 //! ```rust
-//! # fn main() -> Result<(), ()> {
-//! # use libes::{auth, Ecies, enc, key};
+//! # use libes::{Error, auth, Ecies, enc, key};
+//! # fn main() -> Result<(), Error> {
 //! // Create an alias for Ecies with our chosen algorithms
 //! type MyEcies = Ecies<key::X25519, enc::XChaCha20Poly1305, auth::Aead>;
 //!
@@ -116,7 +116,7 @@
 //!
 //! // Encrypt the message
 //! let message = b"Hello Alice, this is Bob.";
-//! let encrypted_message = encryptor.encrypt(message);
+//! let encrypted_message = encryptor.encrypt(message)?;
 //!
 //! // Send encrypted_message to the message recipient
 //! #
@@ -133,8 +133,8 @@
 //!
 //! ### Receiver
 //! ```rust
-//! # fn main() -> Result<(), ()> {
-//! # use libes::{auth, Ecies, enc, key};
+//! # use libes::{Error, auth, Ecies, enc, key};
+//! # fn main() -> Result<(), Error> {
 //! // Create an alias for Ecies with our chosen algorithms
 //! type MyEcies = Ecies<key::X25519, enc::XChaCha20Poly1305, auth::Aead>;
 //!
@@ -152,7 +152,7 @@
 //! #
 //! # // Encrypt the message
 //! # let message = b"Hello Alice, this is Bob.";
-//! # let encrypted_message = encryptor.encrypt(message);
+//! # let encrypted_message = encryptor.encrypt(message)?;
 //! #
 //! # // Send encrypted_message to the message recipient
 //! #
@@ -245,6 +245,10 @@ use key::conversion::{IntoPublicKey, TryIntoPublicKey};
 use key::generics::Key;
 use std::marker::PhantomData;
 
+/// Generic error type
+#[derive(Debug)]
+pub struct Error;
+
 /// Generic `ECIES` instance
 pub struct Ecies<K, E, A> {
     recipient_pk: K,
@@ -264,7 +268,7 @@ impl<K: Key, E, A> Ecies<K, E, A> {
         }
     }
 
-    pub fn try_new<T: TryIntoPublicKey<K>>(recipient_public_key: T) -> Result<Self, ()> {
+    pub fn try_new<T: TryIntoPublicKey<K>>(recipient_public_key: T) -> Result<Self, Error> {
         Ok(Self::new(recipient_public_key.try_into_pk()?))
     }
 }
@@ -277,7 +281,7 @@ where
     A: Mac + SplitMacKey,
 {
     /// Encrypt `plaintext` using the `ECIES-MAC` variant
-    pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
+    pub fn encrypt(&self, plaintext: &[u8]) -> Result<Vec<u8>, Error> {
         // Generate
         let (ephemeral_pk, ephemeral_sk) = K::get_ephemeral_key();
         let nonce = E::get_nonce();
@@ -289,12 +293,12 @@ where
             shared_secret,
             E::ENC_KEY_LEN + A::MAC_KEY_LEN,
         );
-        let enc_key = E::get_enc_key(&mut derived_key);
-        let mac_key = A::get_mac_key(&mut derived_key);
+        let enc_key = E::get_enc_key(&mut derived_key)?;
+        let mac_key = A::get_mac_key(&mut derived_key)?;
 
         // Process
-        let ciphertext = E::encrypt(&enc_key, &nonce, plaintext);
-        let mac = A::digest(&mac_key, &nonce, &ciphertext);
+        let ciphertext = E::encrypt(&enc_key, &nonce, plaintext)?;
+        let mac = A::digest(&mac_key, &nonce, &ciphertext)?;
 
         // Output
         let mut out = Vec::new();
@@ -303,7 +307,7 @@ where
         out.extend_from_slice(mac.as_slice());
         out.extend_from_slice(ciphertext.as_slice());
 
-        out
+        Ok(out)
     }
 }
 
@@ -319,12 +323,12 @@ where
     pub fn decrypt<T: IntoSecretKey<K>>(
         recipient_secret_key: T,
         ciphertext: &[u8],
-    ) -> Result<Vec<u8>, ()> {
+    ) -> Result<Vec<u8>, Error> {
         let mut ciphertext = ciphertext.to_vec();
 
-        let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
-        let nonce = E::get_nonce(&mut ciphertext);
-        let mac = A::get_mac(&mut ciphertext);
+        let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext)?;
+        let nonce = E::get_nonce(&mut ciphertext)?;
+        let mac = A::get_mac(&mut ciphertext)?;
 
         let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.into_sk());
         let mut derived_key = K::derive_key_material(
@@ -332,8 +336,8 @@ where
             shared_secret,
             E::ENC_KEY_LEN + A::MAC_KEY_LEN,
         );
-        let enc_key = E::get_enc_key(&mut derived_key);
-        let mac_key = A::get_mac_key(&mut derived_key);
+        let enc_key = E::get_enc_key(&mut derived_key)?;
+        let mac_key = A::get_mac_key(&mut derived_key)?;
 
         A::verify(&mac_key, &nonce, &ciphertext, &mac)?;
         E::decrypt(&enc_key, &nonce, &ciphertext)
@@ -347,7 +351,7 @@ where
     E: EciesAeadEncryptionSupport + Encryption + GenNonce + SplitEncKey,
 {
     /// Encrypt `plaintext` using the `ECIES-AEAD` variant
-    pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
+    pub fn encrypt(&self, plaintext: &[u8]) -> Result<Vec<u8>, Error> {
         // Generate
         let (ephemeral_pk, ephemeral_sk) = K::get_ephemeral_key();
         let nonce = E::get_nonce();
@@ -355,10 +359,10 @@ where
         // Derive
         let shared_secret = K::key_exchange(&self.recipient_pk, ephemeral_sk);
         let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN);
-        let enc_key = E::get_enc_key(&mut derived_key);
+        let enc_key = E::get_enc_key(&mut derived_key)?;
 
         // Process
-        let ciphertext = E::encrypt(&enc_key, &nonce, plaintext);
+        let ciphertext = E::encrypt(&enc_key, &nonce, plaintext)?;
 
         // Output
         let mut out = Vec::new();
@@ -366,7 +370,7 @@ where
         out.extend_from_slice(nonce.as_slice());
         out.extend_from_slice(ciphertext.as_slice());
 
-        out
+        Ok(out)
     }
 }
 
@@ -381,15 +385,15 @@ where
     pub fn decrypt<T: IntoSecretKey<K>>(
         recipient_secret_key: T,
         ciphertext: &[u8],
-    ) -> Result<Vec<u8>, ()> {
+    ) -> Result<Vec<u8>, Error> {
         let mut ciphertext = ciphertext.to_vec();
 
-        let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
-        let nonce = E::get_nonce(&mut ciphertext);
+        let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext)?;
+        let nonce = E::get_nonce(&mut ciphertext)?;
 
         let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.into_sk());
         let mut derived_key = K::derive_key_material(&ephemeral_pk, shared_secret, E::ENC_KEY_LEN);
-        let enc_key = E::get_enc_key(&mut derived_key);
+        let enc_key = E::get_enc_key(&mut derived_key)?;
 
         E::decrypt(&enc_key, &nonce, &ciphertext)
     }
@@ -402,7 +406,7 @@ where
     E: EciesSynEncryptionSupport + Encryption + SplitNonce + SplitEncKey,
 {
     /// Encrypt `plaintext` using the `ECIES-SYN` variant
-    pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
+    pub fn encrypt(&self, plaintext: &[u8]) -> Result<Vec<u8>, Error> {
         // Generate
         let (ephemeral_pk, ephemeral_sk) = K::get_ephemeral_key();
 
@@ -413,18 +417,18 @@ where
             shared_secret,
             E::ENC_KEY_LEN + E::ENC_NONCE_LEN,
         );
-        let enc_key = E::get_enc_key(&mut derived_key);
-        let nonce = E::get_nonce(&mut derived_key);
+        let enc_key = E::get_enc_key(&mut derived_key)?;
+        let nonce = E::get_nonce(&mut derived_key)?;
 
         // Process
-        let ciphertext = E::encrypt(&enc_key, &nonce, plaintext);
+        let ciphertext = E::encrypt(&enc_key, &nonce, plaintext)?;
 
         // Output
         let mut out = Vec::new();
         out.extend_from_slice(ephemeral_pk.as_bytes());
         out.extend_from_slice(ciphertext.as_slice());
 
-        out
+        Ok(out)
     }
 }
 
@@ -439,10 +443,10 @@ where
     pub fn decrypt<T: IntoSecretKey<K>>(
         recipient_secret_key: T,
         ciphertext: &[u8],
-    ) -> Result<Vec<u8>, ()> {
+    ) -> Result<Vec<u8>, Error> {
         let mut ciphertext = ciphertext.to_vec();
 
-        let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext);
+        let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext)?;
 
         let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.into_sk());
         let mut derived_key = K::derive_key_material(
@@ -450,8 +454,8 @@ where
             shared_secret,
             E::ENC_KEY_LEN + E::ENC_NONCE_LEN,
         );
-        let enc_key = E::get_enc_key(&mut derived_key);
-        let nonce = E::get_nonce(&mut derived_key);
+        let enc_key = E::get_enc_key(&mut derived_key)?;
+        let nonce = E::get_nonce(&mut derived_key)?;
 
         E::decrypt(&enc_key, &nonce, &ciphertext)
     }

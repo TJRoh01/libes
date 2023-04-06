@@ -27,7 +27,7 @@ fn x25519_xchachapoly1305_hmacsha256() {
 
     // Instantiate Ecies & Encrypt
     let enc = X25519XChaCha20Poly1305HmacSha256::new(pk2);
-    let ciphertext = enc.encrypt(LOREM_IPSUM);
+    let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
 
     // Decrypt
     let plaintext =
@@ -55,7 +55,7 @@ fn x25519_xchachapoly1305_aead() {
 
     // Instantiate Ecies & Encrypt
     let enc = X25519XChaCha20Poly1305Aead::new(pk2);
-    let ciphertext = enc.encrypt(LOREM_IPSUM);
+    let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
 
     // Decrypt
     let plaintext =
@@ -83,7 +83,7 @@ fn x25519_xchachapoly1305_syn() {
 
     // Instantiate Ecies & Encrypt
     let enc = X25519XChaCha20Poly1305Syn::new(pk2);
-    let ciphertext = enc.encrypt(LOREM_IPSUM);
+    let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
 
     // Decrypt
     let plaintext =
