@@ -83,8 +83,8 @@ impl Key for X25519 {
     const EC_PUBLIC_KEY_LEN: usize = 32;
     type SecretKey = x25519_dalek::StaticSecret;
 
-    fn as_bytes(&self) -> &[u8] {
-        self.0.as_bytes()
+    fn as_bytes(&self) -> Vec<u8> {
+        self.0.as_bytes().to_vec()
     }
 
     fn from_bytes(x: &[u8]) -> Self {

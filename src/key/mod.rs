@@ -12,3 +12,8 @@ pub use x25519::X25519;
 mod ed25519;
 #[cfg(feature = "ed25519")]
 pub use ed25519::Ed25519;
+
+#[cfg(feature = "secp256r1")]
+mod secp256r1;
+#[cfg(feature = "secp256r1")]
+pub use secp256r1::Secp256r1;
