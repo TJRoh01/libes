@@ -29,7 +29,7 @@ fn secp256r1_aes256gcm_hmacsha256() {
     let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
 
     // Decrypt
-    let plaintext = Scheme::decrypt(sk, &ciphertext).expect("decryption failed");
+    let plaintext = Scheme::decrypt(&sk, &ciphertext).expect("decryption failed");
 
     assert_eq!(LOREM_IPSUM.to_vec(), plaintext);
 }
@@ -54,7 +54,7 @@ fn secp256r1_aes256gcm_aead() {
     let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
 
     // Decrypt
-    let plaintext = Scheme::decrypt(sk, &ciphertext).expect("decryption failed");
+    let plaintext = Scheme::decrypt(&sk, &ciphertext).expect("decryption failed");
 
     assert_eq!(LOREM_IPSUM.to_vec(), plaintext);
 }
@@ -79,7 +79,7 @@ fn secp256r1_aes256gcm_syn() {
     let ciphertext = enc.encrypt(LOREM_IPSUM).expect("encryption failed");
 
     // Decrypt
-    let plaintext = Scheme::decrypt(sk, &ciphertext).expect("decryption failed");
+    let plaintext = Scheme::decrypt(&sk, &ciphertext).expect("decryption failed");
 
     assert_eq!(LOREM_IPSUM.to_vec(), plaintext);
 }

@@ -111,7 +111,7 @@
 //! # // Send encrypted_message to the message recipient
 //! #
 //! # // Decrypt the message
-//! # let decrypted_message = MyEcies::decrypt(secret_key, &encrypted_message)?;
+//! # let decrypted_message = MyEcies::decrypt(&secret_key, &encrypted_message)?;
 //! #
 //! # assert_eq!(message.to_vec(), decrypted_message);
 //! #
@@ -163,7 +163,7 @@
 //! // Send encrypted_message to the message recipient
 //! #
 //! # // Decrypt the message
-//! # let decrypted_message = MyEcies::decrypt(secret_key, &encrypted_message)?;
+//! # let decrypted_message = MyEcies::decrypt(&secret_key, &encrypted_message)?;
 //! #
 //! # assert_eq!(message.to_vec(), decrypted_message);
 //! #
@@ -215,7 +215,7 @@
 //! # // Send encrypted_message to the message recipient
 //! #
 //! // Decrypt the message
-//! let decrypted_message = MyEcies::decrypt(secret_key, &encrypted_message)?;
+//! let decrypted_message = MyEcies::decrypt(&secret_key, &encrypted_message)?;
 //! #
 //! # assert_eq!(message.to_vec(), decrypted_message);
 //! #
@@ -230,10 +230,10 @@
 //! | Algorithm/ECIES Variant | ECIES-MAC | ECIES-AEAD | ECIES-SYN |
 //! |:-----------------------:|:---------:|:----------:|:---------:|
 //! |         x25519          |    🚀     |     🚀     |    🚀     |
-//! |         ed25519         |    🚀     |    🚀️     |    🚀️    |
-//! |    K-256 / secp256k1    |    📅     |     📅     |    📅     |
-//! |    P-256 / secp256r1    |    📅     |     📅     |    📅     |
-//! |    P-384 / secp384r1    |    🤔     |     🤔     |    🤔     |
+//! |         ed25519         |    🚀     |    🚀     |    🚀    |
+//! |    K-256 / secp256k1    |    🚀     |     🚀     |    🚀     |
+//! |    P-256 / secp256r1    |    🚀     |     🚀     |    🚀     |
+//! |    P-384 / secp384r1    |    🚀     |     🚀     |    🚀     |
 //! |    P-521 / secp521r1    |    🤔     |     🤔     |    🤔     |
 //!
 //! ### Encryption Support Matrix
@@ -390,7 +390,7 @@ where
     /// Decrypt `ciphertext` using the `ECIES-MAC` variant, given the `recipient_secret_key` it was
     /// encrypted for
     pub fn decrypt<T: IntoSecretKeyRef<K>>(
-        recipient_secret_key: T,
+        recipient_secret_key: &T,
         ciphertext: &[u8],
     ) -> Result<Vec<u8>, EciesError> {
         let mut ciphertext = ciphertext.to_vec();
@@ -453,7 +453,7 @@ where
     /// Decrypt `ciphertext` using the `ECIES-AEAD` variant, given the `recipient_secret_key` it was
     /// encrypted for
     pub fn decrypt<T: IntoSecretKeyRef<K>>(
-        recipient_secret_key: T,
+        recipient_secret_key: &T,
         ciphertext: &[u8],
     ) -> Result<Vec<u8>, EciesError> {
         let mut ciphertext = ciphertext.to_vec();
@@ -512,7 +512,7 @@ where
     /// Decrypt `ciphertext` using the `ECIES-SYN` variant, given the `recipient_secret_key` it was
     /// encrypted for
     pub fn decrypt<T: IntoSecretKeyRef<K>>(
-        recipient_secret_key: T,
+        recipient_secret_key: &T,
         ciphertext: &[u8],
     ) -> Result<Vec<u8>, EciesError> {
         let mut ciphertext = ciphertext.to_vec();
