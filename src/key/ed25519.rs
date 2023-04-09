@@ -3,6 +3,7 @@ use super::generics::{GenerateEphemeralKey, Key, KeyExchange};
 use crate::KeyError;
 use rand_core::OsRng;
 use sha2::{Digest, Sha512};
+use crate::key::conversion::SecretKeyFromRef;
 
 #[cfg(feature = "ECIES-MAC")]
 use crate::markers::{EciesMacDecryptionSupport, EciesMacEncryptionSupport};
@@ -85,6 +86,12 @@ impl SecretKeyFrom<x25519_dalek::StaticSecret> for Ed25519 {
     }
 }
 
+impl SecretKeyFromRef<x25519_dalek::StaticSecret> for Ed25519 {
+    fn sk_from_ref(x: &x25519_dalek::StaticSecret) -> &Self::SecretKey {
+        x
+    }
+}
+
 impl SecretKeyFrom<[u8; 32]> for Ed25519 {
     fn sk_from(x: [u8; 32]) -> Self::SecretKey {
         let hash: [u8; 32] = Sha512::digest(x.as_slice()).as_slice()[..32]
@@ -129,7 +136,7 @@ impl GenerateEphemeralKey for Ed25519 {
 }
 
 impl KeyExchange for Ed25519 {
-    fn key_exchange(&self, sk: Self::SecretKey) -> Vec<u8> {
+    fn key_exchange(&self, sk: &Self::SecretKey) -> Vec<u8> {
         sk.diffie_hellman(&self.0).to_bytes().to_vec()
     }
 }

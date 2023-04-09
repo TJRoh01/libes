@@ -3,6 +3,7 @@ use super::conversion::{PublicKeyFrom, SecretKeyFrom, TryPublicKeyFrom};
 use super::generics::{GenerateEphemeralKey, Key, KeyExchange};
 use crate::KeyError;
 use rand_core::OsRng;
+use crate::key::conversion::SecretKeyFromRef;
 
 #[cfg(feature = "ECIES-MAC")]
 use crate::markers::{EciesMacDecryptionSupport, EciesMacEncryptionSupport};
@@ -61,6 +62,12 @@ impl SecretKeyFrom<k256::ecdh::EphemeralSecret> for Secp256k1 {
     }
 }
 
+impl SecretKeyFromRef<k256::ecdh::EphemeralSecret> for Secp256k1 {
+    fn sk_from_ref(x: &k256::ecdh::EphemeralSecret) -> &Self::SecretKey {
+        x
+    }
+}
+
 impl Key for Secp256k1 {
     const EC_PUBLIC_KEY_LEN: usize = 33;
     type SecretKey = k256::ecdh::EphemeralSecret;
@@ -83,7 +90,7 @@ impl GenerateEphemeralKey for Secp256k1 {
 }
 
 impl KeyExchange for Secp256k1 {
-    fn key_exchange(&self, sk: Self::SecretKey) -> Vec<u8> {
+    fn key_exchange(&self, sk: &Self::SecretKey) -> Vec<u8> {
         sk.diffie_hellman(&self.0).raw_secret_bytes().to_vec()
     }
 }

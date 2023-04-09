@@ -13,7 +13,7 @@ pub trait Key {
 
 // ECDH key exchange implementation
 pub trait KeyExchange: Key {
-    fn key_exchange(&self, sk: Self::SecretKey) -> Vec<u8>;
+    fn key_exchange(&self, sk: &Self::SecretKey) -> Vec<u8>;
 }
 
 // Provide ephemeral key pair from a CSPRNG

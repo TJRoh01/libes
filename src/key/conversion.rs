@@ -64,6 +64,25 @@ where
     }
 }
 
+/// A &value -> &`SecretKey` conversion that consumes the input value. The opposite of [IntoSecretKey].
+pub trait SecretKeyFromRef<T>: Key {
+    fn sk_from_ref(x: &T) -> &Self::SecretKey;
+}
+
+/// A &value -> &`SecretKey` conversion that consumes the input value. The opposite of [SecretKeyFrom].
+pub trait IntoSecretKeyRef<U: Key> {
+    fn into_sk_ref(&self) -> &U::SecretKey;
+}
+
+impl<T, U> IntoSecretKeyRef<U> for T
+    where
+        U: SecretKeyFromRef<T>,
+{
+    fn into_sk_ref(&self) -> &U::SecretKey {
+        U::sk_from_ref(self)
+    }
+}
+
 /// Attempt a value -> `SecretKey` conversion that consumes the input value. The opposite of [TryIntoSecretKey].
 pub trait TrySecretKeyFrom<T>: Key {
     fn try_sk_from(x: T) -> Result<Self::SecretKey, KeyError>;
