@@ -33,7 +33,7 @@
     x25519 = ["dep:x25519-dalek"]
     ed25519 = ["dep:ed25519-dalek", "dep:x25519-dalek", "dep:curve25519-dalek"]
     K-256 = ["secp256k1"]
-    secp256k1 = []
+    secp256k1 = ["dep:k256"]
     P-256 = ["secp256r1"]
     secp256r1 = ["dep:p256"]
 # Encryption
@@ -50,8 +50,9 @@
     hmac = { version = "0.12", optional = true }
     x25519-dalek = { version = "2.0.0-rc.2", features = ["reusable_secrets", "static_secrets"], optional = true }
     ed25519-dalek = { version = "1.0", optional = true }
-    p256 = { version = "0.13", features = ["arithmetic", "ecdh", "ecdsa"], optional = true }
     curve25519-dalek = { version = "3.2", optional = true }
+    p256 = { version = "0.13", features = ["arithmetic", "ecdh", "ecdsa"], optional = true }
+    k256 = { version = "0.13", features = ["arithmetic", "ecdh", "ecdsa"], optional = true }
     chacha20poly1305 = { version = "0.10", optional = true }
     aes-gcm = { version = "0.10", optional = true }
 
