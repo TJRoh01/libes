@@ -287,7 +287,7 @@ use enc::generics::GenerateNonce;
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
 use enc::generics::{Encryption, TakeEncryptionKey, TakeNonce};
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
-use key::conversion::IntoSecretKey;
+use key::conversion::IntoSecretKeyRef;
 #[cfg(any(feature = "ECIES-MAC", feature = "ECIES-AEAD", feature = "ECIES-SYN"))]
 use key::generics::{DeriveKeyMaterial, GenerateEphemeralKey, KeyExchange, TakeEphemeralKey};
 
@@ -356,7 +356,7 @@ where
         let nonce = E::get_nonce();
 
         // Derive
-        let shared_secret = K::key_exchange(&self.recipient_pk, ephemeral_sk);
+        let shared_secret = K::key_exchange(&self.recipient_pk, &ephemeral_sk);
         let mut derived_key = K::derive_key_material(
             &ephemeral_pk,
             shared_secret,
@@ -389,7 +389,7 @@ where
 {
     /// Decrypt `ciphertext` using the `ECIES-MAC` variant, given the `recipient_secret_key` it was
     /// encrypted for
-    pub fn decrypt<T: IntoSecretKey<K>>(
+    pub fn decrypt<T: IntoSecretKeyRef<K>>(
         recipient_secret_key: T,
         ciphertext: &[u8],
     ) -> Result<Vec<u8>, EciesError> {
@@ -399,7 +399,7 @@ where
         let nonce = E::get_nonce(&mut ciphertext)?;
         let mac = A::get_mac(&mut ciphertext)?;
 
-        let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.into_sk());
+        let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.into_sk_ref());
         let mut derived_key = K::derive_key_material(
             &ephemeral_pk,
             shared_secret,
@@ -426,7 +426,7 @@ where
         let nonce = E::get_nonce();
 
         // Derive
-        let shared_secret = K::key_exchange(&self.recipient_pk, ephemeral_sk);
+        let shared_secret = K::key_exchange(&self.recipient_pk, &ephemeral_sk);
         let mut derived_key =
             K::derive_key_material(&ephemeral_pk, shared_secret, E::ENCRYPTION_KEY_LEN);
         let enc_key = E::get_encryption_key(&mut derived_key)?;
@@ -452,7 +452,7 @@ where
 {
     /// Decrypt `ciphertext` using the `ECIES-AEAD` variant, given the `recipient_secret_key` it was
     /// encrypted for
-    pub fn decrypt<T: IntoSecretKey<K>>(
+    pub fn decrypt<T: IntoSecretKeyRef<K>>(
         recipient_secret_key: T,
         ciphertext: &[u8],
     ) -> Result<Vec<u8>, EciesError> {
@@ -461,7 +461,7 @@ where
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext)?;
         let nonce = E::get_nonce(&mut ciphertext)?;
 
-        let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.into_sk());
+        let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.into_sk_ref());
         let mut derived_key =
             K::derive_key_material(&ephemeral_pk, shared_secret, E::ENCRYPTION_KEY_LEN);
         let enc_key = E::get_encryption_key(&mut derived_key)?;
@@ -482,7 +482,7 @@ where
         let (ephemeral_pk, ephemeral_sk) = K::get_ephemeral_key();
 
         // Derive
-        let shared_secret = K::key_exchange(&self.recipient_pk, ephemeral_sk);
+        let shared_secret = K::key_exchange(&self.recipient_pk, &ephemeral_sk);
         let mut derived_key = K::derive_key_material(
             &ephemeral_pk,
             shared_secret,
@@ -511,7 +511,7 @@ where
 {
     /// Decrypt `ciphertext` using the `ECIES-SYN` variant, given the `recipient_secret_key` it was
     /// encrypted for
-    pub fn decrypt<T: IntoSecretKey<K>>(
+    pub fn decrypt<T: IntoSecretKeyRef<K>>(
         recipient_secret_key: T,
         ciphertext: &[u8],
     ) -> Result<Vec<u8>, EciesError> {
@@ -519,7 +519,7 @@ where
 
         let ephemeral_pk = K::get_ephemeral_key(&mut ciphertext)?;
 
-        let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.into_sk());
+        let shared_secret = K::key_exchange(&ephemeral_pk, recipient_secret_key.into_sk_ref());
         let mut derived_key = K::derive_key_material(
             &ephemeral_pk,
             shared_secret,
