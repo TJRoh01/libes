@@ -73,6 +73,13 @@ impl Key for Secp256r1 {
         let fixed_arr: [u8; 33] = x.try_into().expect("invalid length");
         Self(p256::PublicKey::from_encoded_point(&p256::EncodedPoint::from_bytes(fixed_arr).expect("key initialization error")).unwrap())
     }
+
+    fn from_rng() -> (Self, Self::SecretKey) {
+        let sk = p256::ecdh::EphemeralSecret::random(&mut OsRng);
+        let pk = sk.public_key();
+
+        (Self(pk), sk)
+    }
 }
 
 impl GenerateEphemeralKey for Secp256r1 {

@@ -73,6 +73,13 @@ impl Key for Secp384r1 {
         let fixed_arr: [u8; Self::EC_PUBLIC_KEY_LEN] = x.try_into().expect("invalid length");
         Self(p384::PublicKey::from_encoded_point(&p384::EncodedPoint::from_bytes(fixed_arr).expect("key initialization error")).unwrap())
     }
+
+    fn from_rng() -> (Self, Self::SecretKey) {
+        let sk = p384::ecdh::EphemeralSecret::random(&mut OsRng);
+        let pk = sk.public_key();
+
+        (Self(pk), sk)
+    }
 }
 
 impl GenerateEphemeralKey for Secp384r1 {

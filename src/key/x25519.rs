@@ -91,6 +91,13 @@ impl Key for X25519 {
         let fixed_arr: [u8; 32] = x.try_into().expect("invalid length");
         Self(x25519_dalek::PublicKey::from(fixed_arr))
     }
+
+    fn from_rng() -> (Self, Self::SecretKey) {
+        let sk = x25519_dalek::StaticSecret::random_from_rng(OsRng);
+        let pk = x25519_dalek::PublicKey::from(&sk);
+
+        (Self(pk), sk)
+    }
 }
 
 impl GenerateEphemeralKey for X25519 {

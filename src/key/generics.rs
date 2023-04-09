@@ -2,13 +2,13 @@ use crate::EciesError;
 use hkdf::Hkdf;
 use sha2::Sha256;
 
-// Elliptic curve key implementation
-pub trait Key {
+pub trait Key: Sized {
     const EC_PUBLIC_KEY_LEN: usize;
     type SecretKey;
 
     fn as_bytes(&self) -> Vec<u8>;
     fn from_bytes(x: &[u8]) -> Self;
+    fn from_rng() -> (Self, Self::SecretKey);
 }
 
 // ECDH key exchange implementation
