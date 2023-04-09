@@ -1,9 +1,9 @@
 [package]
     name = "libes"
-    version = "0.6.0"
+    version = "0.9.0"
     authors = ["Tomas Rohatynski"]
     edition = "2021"
-    rust-version = "1.60"
+    rust-version = "1.65"
     description = "Collection of Elliptic Curve Integrated Encryption Scheme(s)"
     readme = "README_CRATES_IO.md"
     homepage = "https://github.com/TJRoh01/libes"
