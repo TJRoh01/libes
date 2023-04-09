@@ -13,6 +13,12 @@ mod ed25519;
 #[cfg(feature = "ed25519")]
 pub use ed25519::Ed25519;
 
+#[cfg(feature = "secp256k1")]
+mod secp256k1;
+
+#[cfg(feature = "secp256k1")]
+pub use secp256k1::Secp256k1;
+
 #[cfg(feature = "secp256r1")]
 mod secp256r1;
 
