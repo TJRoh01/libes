@@ -1,6 +1,6 @@
 [package]
     name = "libes"
-    version = "0.9.1"
+    version = "0.10.0"
     authors = ["Tomas Rohatynski"]
     edition = "2021"
     rust-version = "1.65"
@@ -58,6 +58,7 @@
     p384 = { version = "0.13", features = ["arithmetic", "ecdh", "ecdsa"], optional = true }
     chacha20poly1305 = { version = "0.10", optional = true }
     aes-gcm = { version = "0.10", optional = true }
+    thiserror = "1.*" 
 
 [dev-dependencies]
     rand = "0.7"

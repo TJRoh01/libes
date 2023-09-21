@@ -295,26 +295,31 @@ use key::conversion::{IntoPublicKey, TryIntoPublicKey};
 use key::generics::Key;
 use std::marker::PhantomData;
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum EciesError {
     /// Failed to parse some data
     ///
     /// - for encryption: `internal error`
     /// - for decryption: `bad ciphertext` or `internal error`
+    #[error("failed to parse some data")]
     BadData,
     /// Failed to verify attached Authentication Tag
     ///
     /// Only on ECIES-MAC
+    #[error("failed to verify attached authentication tag")]
     VerificationError,
     /// Failed to encrypt data
+    #[error("failed to encrypt data")]
     EncryptionError,
     /// Failed to decrypt data
+    #[error("failed to decrypt data")]
     DecryptionError,
 }
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum KeyError {
     /// Failed to convert raw key data into key for specified algorithm
+    #[error("failed to convert raw key data into key for specified algorithm")]
     BadData,
 }
 
