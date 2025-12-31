@@ -1,3 +1,7 @@
+# Archived Project
+
+This project has served as a way for me to practice setting up a complete public software project. I have not had the need to develop this code further since, so I have archived it.
+
 # libes
 ![Crates.io](https://img.shields.io/crates/l/libes?style=flat)
 [![GitHub last commit](https://img.shields.io/github/last-commit/TJRoh01/libes?style=flat)](https://github.com/TJRoh01/libes)
